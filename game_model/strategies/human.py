@@ -1,6 +1,6 @@
 
 
-from game_model.strategy import*
+from game_model.strategies.strategy import*
 
 
 class Human(Strategy):
@@ -8,6 +8,8 @@ class Human(Strategy):
     def __init__(self):
         pass
 
+    def name(self):
+        return "Human"
 
     def __ask_cell__(self,is_start=True):
         prompt=None
@@ -27,6 +29,7 @@ class Human(Strategy):
             return ( int(int (coords[0])), int(int(coords[1])))
 
         return None
+
 
 
 

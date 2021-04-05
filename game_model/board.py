@@ -1,14 +1,14 @@
 import numpy as np;
 
 class Board:
-    def __init__(self,xsize,ysize,initial_positions:[]=-1):
+    def __init__(self,xsize=8,ysize=8,initial_positions:[]=-1):
         self.shape=(xsize,ysize)
         self.positions=np.zeros(self.shape)  # a 2ndarray, for each position : the value = 0 (empty) 1 => player1 and -1=>player2
 
 
         if initial_positions==-1:
             self.positions[0][0]=1
-            self.positions[2][0] = -1
+
             self.positions[xsize-1][ysize-1]=1
             self.positions[0][ysize-1]=-1
             self.positions[xsize-1][0]=-1

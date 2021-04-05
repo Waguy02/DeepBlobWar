@@ -1,6 +1,7 @@
 import numpy as np
 from game_model.board import  Board
-from game_model.strategy import  Strategy
+from game_model.strategies.strategy import  Strategy
+from game_model.strategies.greedy import Greedy
 class Configuration:
     def __init__(self,board:Board):
         """
@@ -15,11 +16,11 @@ class Configuration:
 
     def battle(self,player1:Strategy,player2:Strategy):
         while not self.game_over():
-
             playerId=min(2-self.current_player,2) # 1= > player1; -1=> player2
-            icon="x" if playerId==1 else "O"
+            (icon,playerName)=("x",player1.name()) if playerId==1 else ("O",player2.name())
+
             self.display()
-            print("Player", str(playerId)+"("+icon+") is playing... His score is actually : ", self.value(), "\n")
+            print("Player"+str(playerId)+":"+playerName+ "("+icon+") is playing... His score is actually : ", self.value(), "\n")
 
             attempt=None
             if (self.current_player==1):
@@ -41,14 +42,15 @@ class Configuration:
         self.current_player=-1
         value2=self.value()
 
+        self.display()
         if value1>value2:
-            print("Player 1  won, score : ",value1)
+            print("Player 1 :"+playerName+"  won, score : ",value1)
             return 1
         if value1==value2:
             print("Draw  , score : ", value1)
             return 0
         else:
-            print("Player 2 won, score : ",value2)
+            print("Player 2:"+playerName+" won, score : ",value2)
             return -1
 
 
@@ -147,7 +149,7 @@ class Configuration:
 
 
     def movements(self)->[]:
-        return self.jumps()+self.duplicates()
+        return self.duplicates()+self.jumps()
 
     def apply_movement(self, mvt: []):
         x_source, y_source = mvt[0]
@@ -174,6 +176,7 @@ class Configuration:
 
     def clone(self):
         clone_conf = Configuration(self.board.clone())
+        clone_conf.current_player=self.current_player
         return clone_conf
 
     def distance(self, mvt: []):
@@ -183,10 +186,17 @@ class Configuration:
         return max(np.abs(source[0] - destination[0]), np.abs(source[1] - destination[1]))
 
     def game_over(self):
-        for pos in self.board.positions.flatten():
-            if pos==0:
-                return False
-        return True
+        flatten_positions=self.board.positions.flatten()
+        non_zeros=np.count_nonzero(flatten_positions)
+        if non_zeros==len(flatten_positions):## ALl cases taken
+            return True
+
+        sum=flatten_positions.sum() ## Only  one player remainnng
+        if np.abs(sum)==non_zeros:
+            return True
+
+
+        return False
 
 
 
