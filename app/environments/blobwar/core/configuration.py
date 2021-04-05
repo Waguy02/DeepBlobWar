@@ -1,7 +1,7 @@
 import numpy as np
-from app.environments.blob_war.blob_core.board import  Board
-from app.environments.blob_war.blob_core.strategies.strategy import  Strategy
-from app.environments.blob_war.blob_core.strategies.greedy import Greedy
+from app.environments.blobwar.core.board import  Board
+from app.environments.blobwar.core.strategies.strategy import  Strategy
+from app.environments.blobwar.core.strategies.greedy import Greedy
 class Configuration:
     def __init__(self,board:Board):
         """
@@ -58,43 +58,69 @@ class Configuration:
 
 
 
+
+
     def display(self):
-        space_two="   "
-        space_one=" "
+        print(self.toString())
 
-        print(space_two,end=space_one)
+    def toString(self,player1ID="player1",player2ID="player"):
+        space_two = "   "
+        space_one = " "
+        output = "\n"+space_two + space_one
         for iy in range(self.board.shape[1]):
-            print(iy,end=space_one)
-        print(space_two)
+            output += str(iy) + space_one
 
-        print(space_one,"+",end=space_one)
+        output += "\n"
+
+        output += space_one+space_one+ "+" + space_one
+
         for iy in range(self.board.shape[1]):
-            print("-",end=space_one)
-        print("+")
+            output += "-" + space_one
+
+        output += "+\n"
 
         for ix in range(self.board.shape[0]):
-            print(ix,"|",end=space_one)
+
+            output += str(ix) + space_one + "|" + space_one
 
             for iy in range(self.board.shape[1]):
-                val=self.board.positions[ix][iy]
+                val = self.board.positions[ix][iy]
 
-                if val==-1:
-                    print("0",end=space_one)
+                if val == -1:
+                    output += "0" + space_one
 
-                elif val==0:
-                    print(space_one,end=space_one)
 
-                elif val==1:
-                    print("x",end=space_one)
-            print("|")
+                elif val == 0:
+                    output += space_one + space_one
 
-        print(space_one,"+", end=space_one)
+                elif val == 1:
+                    output += "x" + space_one
+            output += "|\n"
+        output += space_one + space_one + "+" + space_one
+
         for iy in range(self.board.shape[1]):
-            print("-", end=space_one)
-        print("+")
+            output += "-" + space_one
+
+        output += "+\n"
+
+        output += ""
+
+        id = min(2 - self.current_player, 2) - 1
+        id_adverse = min(2 + self.current_player, 2) - 1
+
+        output += "Player" + str(id) + " : Value =>" + str(self.value()) + "( Active)\n"
+        output += "Player" + str(id_adverse) + " : Value =>" + str(self.adverse_value()) + "\n"
+
+        return output
+
 
     def value(self):
         return self.board.positions.flatten().sum()*self.current_player
+
+    def adverse_value(self):
+        return -1*self.board.positions.flatten().sum()*self.current_player
+
+
 
     def jumps(self)->[]:
         ## A jump is tuple ([xi,yi], [xf,yf])
@@ -122,9 +148,34 @@ class Configuration:
                     duplics.append([(ix, iy), neighbour])
         return duplics
 
+    def bad_moves(self):
+        bad_moves=[]
+        for xi in range(self.board.shape[0]):
+             for yi in range(self.board.shape[1]):
+                 for xf in range(self.board.shape[0]):
+                    for yf in range(self.board.shape[1]):
+                        mvt=[(xi,yi),(xf,yf)]
+
+                        if self.board.positions[xi][yi]!=self.current_player:
+                            bad_moves.append(mvt)
+                            continue
+                        if not self.check_move(mvt):
+                            bad_moves.append(mvt)
+
+        return bad_moves
+
+
+
+
+
+
+
+
+
 
     def check_move(self,mvt:[])->bool:
-
+        if mvt==None:
+            return True
         def check_in_board(x,y):
             return x>=0 and x<self.board.shape[0] and y>=0 and y<self.board.shape[1]
 
@@ -150,6 +201,16 @@ class Configuration:
 
     def movements(self)->[]:
         return self.duplicates()+self.jumps()
+
+    def total_movements(self):
+        return self.movements()+self.bad_moves()
+
+    def move_to_nd_array(self,move):
+        return np.array([[move[0][0],move[0][1]],[move[1][0],move[1][1]]])
+
+    def total_movements_nd_array(self):
+        return [self.move_to_nd_array(move) for move in self.total_movements()]
+
 
     def apply_movement(self, mvt: []):
         x_source, y_source = mvt[0]
@@ -191,12 +252,26 @@ class Configuration:
         if non_zeros==len(flatten_positions):## ALl cases taken
             return True
 
-        sum=flatten_positions.sum() ## Only  one player remainnng
-        if np.abs(sum)==non_zeros:
-            return True
+        # sum=flatten_positions.sum() ## Only  one player remainnng
+        # if np.abs(sum)==non_zeros:
+        #     return True
 
 
         return False
+
+    def leading_player(self):
+        value1=self.value()
+
+        self.current_player*=-1
+        value2=self.value()
+
+        self.current_player *= -1
+
+        if value1>value2:
+            return self.current_player
+        if value1<value2:
+            return -1*self.current_player
+        return 0
 
 
 
@@ -259,7 +334,7 @@ class Configuration:
 
             
     """
-    ¨Play mvt according to a given configuration
+    Check if a move is a jump
     """
     def __is_jump__(self, mvt):
         return self.distance(mvt)==2
