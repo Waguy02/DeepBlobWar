@@ -1,6 +1,6 @@
-from game_model.strategies.human import *
-from game_model.strategies.greedy import *
-from game_model.configuration import *
+from app.environments.blob_war.blob_core.strategies.human import *
+from app.environments.blob_war.blob_core.strategies.greedy import *
+from app.environments.blob_war.blob_core.configuration import *
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

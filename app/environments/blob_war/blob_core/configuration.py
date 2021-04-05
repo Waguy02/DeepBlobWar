@@ -1,7 +1,7 @@
 import numpy as np
-from game_model.board import  Board
-from game_model.strategies.strategy import  Strategy
-from game_model.strategies.greedy import Greedy
+from app.environments.blob_war.blob_core.board import  Board
+from app.environments.blob_war.blob_core.strategies.strategy import  Strategy
+from app.environments.blob_war.blob_core.strategies.greedy import Greedy
 class Configuration:
     def __init__(self,board:Board):
         """

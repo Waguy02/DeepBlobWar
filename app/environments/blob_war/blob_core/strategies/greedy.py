@@ -1,8 +1,11 @@
 
 
-from game_model.strategies.strategy import*
+from app.environments.blob_war.blob_core.strategies.strategy import*
 import random
 
+""":cvar
+A greedy strategy for the game 
+"""
 class Greedy(Strategy):
 
     def __init__(self):
@@ -41,18 +44,12 @@ This algo will choose random moves
 class FoolishGreedy(Strategy):
     def __init__(self):
         pass
-
-
     def name(self):
         return "Foolish Greedy"
-
-
     def compute_next_nove(self,configuration):
         moves=configuration.movements()
 
         if len(moves)>0:
-            move_max=None
-
             return moves[int(random.random()*len(moves))] #Randomly choose un move
 
 

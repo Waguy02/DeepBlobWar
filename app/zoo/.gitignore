@@ -1,0 +1,6 @@
+*
+!.gitignore
+!pretrained
+!pretrained/*/
+!pretrained/*/*
+!tmp

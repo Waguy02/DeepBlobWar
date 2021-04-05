@@ -1,6 +1,6 @@
 
 
-from game_model.strategies.strategy import*
+from app.environments.blob_war.blob_core.strategies.strategy import*
 
 
 class Human(Strategy):
