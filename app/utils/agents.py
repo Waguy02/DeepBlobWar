@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-from  environments.blobwar.constants import SIZE
+from environments.blobwar.constants import SIZE
 
 np.set_printoptions(threshold=sys.maxsize)
 import random
@@ -80,7 +80,7 @@ class Agent():
       action = np.argmax(action_probs)
       logger.debug(f'Best action {self.format_action(action)}')
 
-      if not choose_best_action:
+      if not    choose_best_action:
           action = sample_action(action_probs)
           logger.debug(f'Sampled action {self.format_action(action)} chosen')
 
@@ -91,11 +91,9 @@ class Agent():
   def greedy(self, env, choose_best_action, mask_invalid_actions):
       max_action = None
       max_reward = -1
-      xsize = SIZE
-      ysize = SIZE
-      nb_actions = (xsize ** 2) * (ysize ** 2) + 1
+
       legal_actions=env.legal_actions
-      for action in range(nb_actions):
+      for action in range(len(legal_actions)):
           if legal_actions[action]==0:
               continue
           obs, rewards, done, _ = env.step(action,update=False)

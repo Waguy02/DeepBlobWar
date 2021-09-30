@@ -1,7 +1,7 @@
 
 
 
-from  environments.blobwar.core.strategies.strategy import*
+from environments.blobwar.core.strategies.strategy import*
 
 
 class Human(Strategy):
@@ -50,7 +50,7 @@ class Human(Strategy):
 
 
 
-    def compute_next_nove(self,configuration):
+    def compute_next_move(self,configuration):
         if len(configuration.movements())>0:
             while(True):
                 mvt=self.__ask_move__()

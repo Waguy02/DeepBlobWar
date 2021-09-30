@@ -9,13 +9,13 @@ import tensorflow.keras.backend as K
 from stable_baselines.common.policies import ActorCriticPolicy
 from stable_baselines.common.distributions import CategoricalProbabilityDistribution
 
-from  environments.blobwar.constants import SIZE
+from environments.blobwar.constants import SIZE
 
 
 XSIZE=SIZE
 YSIZE=SIZE
 ACTIONS = (XSIZE**2)*(YSIZE**2)
-FEATURE_SIZE = XSIZE*YSIZE
+
 
 
 class CustomPolicy(ActorCriticPolicy):
@@ -32,8 +32,6 @@ class CustomPolicy(ActorCriticPolicy):
         self._setup_init()
 
     def step(self, obs, state=None, mask=None, deterministic=False):
-
-
         if deterministic:
             action, value, neglogp = self.sess.run([self.deterministic_action, self.value_flat, self.neglogp],
                                                    {self.obs_ph: obs})
@@ -68,7 +66,7 @@ def policy_head(y,legal_actions):
     return policy
 
 def resnet_extractor(y, **kwargs):
-    y = convolutional(y, XSIZE-1, YSIZE-1,name="RESNET_CONV")
+    y = convolutional(y, 3,(XSIZE-1, YSIZE-1),name="RESNET_CONV")
     # y = residual(y,  XSIZE-1, YSIZE-1)
     return y
 

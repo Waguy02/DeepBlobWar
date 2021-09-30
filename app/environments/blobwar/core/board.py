@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from  environments.blobwar.constants import SIZE
+from environments.blobwar.constants import SIZE
 class Board:
     def __init__(self,xsize=SIZE,ysize=SIZE,initial_positions:[]=-1):
         self.shape=(xsize,ysize)

@@ -1,5 +1,8 @@
 # docker-compose exec app python3 test.py -d -g 1 -a base base human -e butterfly 
 
+
+from environments.blobwar.core.strategies.human import  Human
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
@@ -32,6 +35,15 @@ def main(args):
   env = get_environment(args.env_name)(verbose = args.verbose, manual = args.manual)
   env.seed(args.seed)
 
+
+  if args.env_name=="blobwar":
+    human_blobwar = Human()
+    # print("Testing encoding")
+    # for action in range((env.xsize ** 2) * env.ysize ** 2):
+    #   decoded = env.decode_action(action)
+    #   recoded = env.encode_action(decoded)
+    #   print(action, env.decode_action(action), recoded)
+
   total_rewards = {}
 
   if args.recommend:
@@ -46,6 +58,9 @@ def main(args):
   #load the agents
   if len(args.agents) != env.n_players:
     raise Exception(f'{len(args.agents)} players specified but this is a {env.n_players} player game!')
+
+
+
 
   for i, agent in enumerate(args.agents):
     if agent == 'human':
@@ -82,7 +97,7 @@ def main(args):
 
       current_player = players[env.current_player_num]
       env.render()
-      logger.debug(f'\nCurrent player name: {current_player.name}')
+      logger.debug(f'Current player name: {current_player.name}')
 
       if args.recommend and current_player.name in ['human', 'rules']:
         # show recommendation from last loaded model
@@ -90,14 +105,15 @@ def main(args):
         action = ppo_agent.choose_action(env, choose_best_action = True, mask_invalid_actions = True)
 
       if current_player.name == 'human':
-        action = input('\nPlease choose an action: ')
+        if args.env_name == "blobwar":
+          move= human_blobwar.compute_next_move(env.core)
+          action=env.encode_action(move)
+        else:
+          action = input('\nPlease choose an action: ')
+
+
         try:
-          # for int actions
           action = int(action)
-
-
-
-
         except:
           # for MulitDiscrete action input as list TODO
           action = eval(action)
@@ -129,6 +145,8 @@ def main(args):
 
   env.close()
     
+
+
 
 
 def cli() -> None:
@@ -177,3 +195,18 @@ def cli() -> None:
 
 if __name__ == '__main__':
   cli()
+#
+#
+# def ask_blobwar_move (self):
+#   print("Enter start point")
+#   source = None
+#   while (source == None):
+#     source = self.__ask_cell__(is_start=True)
+#
+#   print("Enter end point")
+#   dest = None
+#   while dest == None:
+#     dest = self.__ask_cell__(is_start=False)
+#
+#   return [(source[0], source[1]), (dest[0], dest[1])]
+

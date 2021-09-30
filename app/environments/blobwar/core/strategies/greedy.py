@@ -1,6 +1,6 @@
 
 
-from  environments.blobwar.core.strategies.strategy import*
+from environments.blobwar.core.strategies.strategy import*
 import random
 
 """:cvar
@@ -16,7 +16,7 @@ class Greedy(Strategy):
         return "Greedy"
 
 
-    def compute_next_nove(self,configuration):
+    def compute_next_move(self,configuration):
         moves=configuration.movements()
 
         if len(moves)>0:
@@ -46,7 +46,7 @@ class FoolishGreedy(Strategy):
         pass
     def name(self):
         return "Foolish Greedy"
-    def compute_next_nove(self,configuration):
+    def compute_next_move(self,configuration):
         moves=configuration.movements()
 
         if len(moves)>0:

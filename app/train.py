@@ -51,13 +51,10 @@ def main(args):
 
   workerseed = args.seed + 10000 * MPI.COMM_WORLD.Get_rank()
   set_global_seeds(workerseed)
-
   logger.info('\nSetting up the selfplay training environment opponents...')
   base_env = get_environment(args.env_name)
   env = selfplay_wrapper(base_env)(opponent_type = args.opponent_type, verbose = args.verbose)
   env.seed(workerseed)
-
-  
   CustomPolicy = get_network_arch(args.env_name)
 
   params = {'gamma':args.gamma

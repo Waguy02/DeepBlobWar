@@ -1,8 +1,7 @@
 import numpy as np
 
-from  environments.blobwar.core.board import Board
-from  environments.blobwar.core.strategies.strategy import  Strategy
-from  environments.blobwar.core.strategies.greedy import Greedy
+from environments.blobwar.core.board import Board
+from environments.blobwar.core.strategies.strategy import  Strategy
 class Configuration:
     def __init__(self,board:Board):
         """
@@ -13,20 +12,18 @@ class Configuration:
         """
         self.board=board
         self.current_player=1
-
+        self.player1_name=""
+        self.player2_name= ""
 
     def battle(self,player1:Strategy,player2:Strategy):
+        self.player1_name=player1.name()
+        self.player2_name = player2.name()
         while not self.game_over():
-            playerId=min(2-self.current_player,2) # 1= > player1; -1=> player2
-            (icon,playerName)=("x",player1.name()) if playerId==1 else ("O",player2.name())
-
             self.display()
-            print("Player"+str(playerId)+":"+playerName+ "("+icon+") is playing... His score is actually : ", self.value(), "\n")
-
             if (self.current_player==1):
-                attempt=player1.compute_next_nove(self)
+                attempt=player1.compute_next_move(self)
             else :
-                attempt=player2.compute_next_nove(self)
+                attempt=player2.compute_next_move(self)
 
             if  attempt!=None:
                 assert(self.check_move(attempt))
@@ -104,20 +101,34 @@ class Configuration:
 
         output += ""
 
-        id = min(2 - self.current_player, 2) - 1
-        id_adverse = min(2 + self.current_player, 2) - 1
+        if self.current_player==1:
+            id=1
+            id_adverse=2
+            active_name,adverse_name=self.player1_name,self.player2_name
+            active_icon,adverse_icon="x","0"
 
-        output += "Player" + str(id) + " : Value =>" + str(self.value()) + "( Active)\n"
-        output += "Player" + str(id_adverse) + " : Value =>" + str(self.adverse_value()) + "\n"
+        else:
+            id=2
+            id_adverse=1
+            active_name = self.player2_name
+            adverse_name = self.player1_name
+            active_icon, adverse_icon = "0", "x"
+
+
+        output += "Player" + str(id) +"("+active_icon+")"+ ":"+active_name + ":"+str(self.value()) + "  (Current player)\n"
+        output += "Player" + str(id_adverse) +"("+adverse_icon+")"+ ":"+adverse_name + ":"+ str(self.adverse_value()) + "\n"
 
         return output
 
 
+    def player_value(self,id):
+        return self.board.positions.flatten().sum() * id
+
     def value(self):
-        return self.board.positions.flatten().sum()*self.current_player
+        return self.player_value(self.current_player)
 
     def adverse_value(self):
-        return -1*self.board.positions.flatten().sum()*self.current_player
+        return -1*self.value()
 
 
 
@@ -252,6 +263,8 @@ class Configuration:
         if non_zeros==len(flatten_positions):## ALl cases taken
             return True
 
+        if np.abs(flatten_positions.sum())==non_zeros: ##Only one remaining player
+            return True
 
         return False
 

@@ -2,9 +2,9 @@
 
 import gym
 import numpy as np
-from  environments.blobwar.core.board import Board
-from  environments.blobwar.constants import SIZE
-from  environments.blobwar.core.configuration import Configuration
+from environments.blobwar.core.board import Board
+from environments.blobwar.constants import SIZE
+from environments.blobwar.core.configuration import Configuration
 
 
 
@@ -70,10 +70,6 @@ class BlobWarEnv(gym.Env):
         xsize=self.core.board.shape[0]
         ysize=self.core.board.shape[1]
 
-
-        # if action==(xsize**2) *(ysize**2): ##  move 4096 correspond to None
-        #     return None
-
         x1=int(action/((xsize)*(ysize**2)))
         action=action-((xsize)*(ysize**2))*x1
 
@@ -85,47 +81,59 @@ class BlobWarEnv(gym.Env):
 
         y2=action%xsize
 
-
-
         if x1==0 and x2==xsize-1 and y1==0 and y2==ysize-1:
             #Consider this particular action as none action (Condition x_size and y _size >3)
             return None
 
         return [(x1,y1 ),(x2, y2)]
 
+    def encode_action(self,move):
+        if move==None:
+            return [(0,0),(self.xsize-1,self.ysize-1)]
+
+
+        x1,y1=move[0]
+        x2,y2=move[1]
+        xsize=self.xsize
+        ysize=self.ysize
+        return y2+x2*xsize+y1*xsize*ysize +x1*(xsize**2)*ysize
+
+
     @property
     def current_player(self):
-        return min(2 - self.core.current_player, 2) -1   #1=>0, -1 =>1
+        return min(2 - self.core.current_player, 2)-1   #1=>0, -1 =>1
 
     def step(self, action,update=True):
         move=self.decode_action(action)
         old_adverse_value, old_self_value = self.core.adverse_value(), self.core.value()
+        player_num=self.current_player ##The player num before move beginning
+
         if not self.core.check_move(move):
             done=True
             move=None
             if update:
                 self.core.apply_movement(move)
-                new_conf = self.core
+                pass
             else:
-                new_conf = self.core.play(move)
+                pass
             new_adverse_value,new_self_value=old_adverse_value,old_self_value ## Highly penalise illegal moves
         else :
             r, done = self.check_game_over()
-
             if update:
                 self.core.apply_movement(move)
                 new_conf = self.core
                 new_adverse_value, new_self_value =new_conf.value(),new_conf.adverse_value()
             else:
                 new_conf = self.core.play(move)
-                new_adverse_value, new_self_value = new_conf.adverse_value(), new_conf.value()
+                new_adverse_value, new_self_value = new_conf.value(),new_conf.adverse_value()
 
-            ## The player become the adversary
 
-        rewards=[new_adverse_value-old_adverse_value,new_self_value-old_self_value]
 
-        if new_conf.current_player==-1: ##Reverse array of rewards
-            rewards.reverse()
+        if player_num==0:
+            rewards=[new_self_value-old_self_value,new_adverse_value-old_adverse_value]
+        else:
+            rewards = [new_adverse_value - old_adverse_value,new_self_value - old_self_value]
+
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
 
@@ -138,7 +146,7 @@ class BlobWarEnv(gym.Env):
 
     def render(self, mode='human', close=False, verbose=True):
         logger.debug(self.core.toString())
-        logger.debug(f'\nLegal actions: {[str(i) +":" + str(self.decode_action(i)) for i, o in enumerate(self.legal_actions) if o != 0]}')
+        # logger.debug(f'\nLegal actions: {[str(i) +":" + str(self.decode_action(i)) for i, o in enumerate(self.legal_actions) if o != 0]}')
 
 
 
