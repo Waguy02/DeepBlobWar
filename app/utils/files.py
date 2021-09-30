@@ -73,7 +73,8 @@ def load_model(env, name):
             except IOError as e:
                 sys.exit(f'Permissions not granted on zoo/{env.name}/...')
             except Exception as e:
-                print('Waiting for base.zip to be created...')
+
+                print('Waiting for base.zip to be created...',e)
                 time.sleep(2)
                 
     else:

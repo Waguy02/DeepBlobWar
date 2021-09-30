@@ -22,9 +22,7 @@ class CustomPolicy(ActorCriticPolicy):
         with tf.variable_scope("model", reuse=reuse):
 
             obs, legal_actions = split_input(self.processed_obs, ACTIONS)
-
             extracted_features = resnet_extractor(obs, **kwargs)
-
             self._policy = policy_head(extracted_features, legal_actions)
             self._value_fn, self.q_value = value_head(extracted_features)
             self._proba_distribution  = CategoricalProbabilityDistribution(self._policy)

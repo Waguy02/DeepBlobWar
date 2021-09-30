@@ -10,7 +10,6 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 import argparse
 import time
-from shutil import copyfile
 from mpi4py import MPI
 
 from stable_baselines.ppo1 import PPO1
@@ -20,10 +19,10 @@ from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines.common import set_global_seeds
 from stable_baselines import logger
 
-from utils.callbacks import SelfPlayCallback
-from utils.files import reset_files
-from utils.register import get_network_arch, get_environment
-from utils.selfplay import selfplay_wrapper
+from  utils.callbacks import SelfPlayCallback
+from  utils.files import reset_files
+from   utils.register import get_network_arch, get_environment
+from  utils.selfplay import selfplay_wrapper
 
 import config
 
@@ -144,7 +143,7 @@ def cli() -> None:
   parser.add_argument("--best", "-b", action = 'store_true', default = False
               , help="Uses best moves when evaluating agent against rules-based agent")
   parser.add_argument("--env_name", "-e", type = str, default = 'tictactoe'
-              , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt")
+              , help="Which gym environment to train in: tictactoe, connect4, sushigo, butterfly, geschenkt,blobwar")
   parser.add_argument("--seed", "-s",  type = int, default = 17
             , help="Random seed")
   parser.add_argument("--eval_freq", "-ef",  type = int, default = 10240

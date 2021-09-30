@@ -2,58 +2,48 @@
 
 import gym
 import numpy as np
-from app.environments.blobwar.core.board import Board
-from app.environments.blobwar.core.configuration import Configuration
+from  environments.blobwar.core.board import Board
+from  environments.blobwar.constants import SIZE
+from  environments.blobwar.core.configuration import Configuration
 
 
-import config
 
-# from stable_baselines import logger
-import logger
 
+from stable_baselines import logger
 class Player():
     def __init__(self, id, token):
         self.id = id
         self.token = token
-
-
 class Token():
     def __init__(self, symbol, number):
         self.number = number
         self.symbol = symbol
-
-
 class BlobWarEnv(gym.Env):
     metadata = {'render.modes': ['human']}
-
     def __init__(self, verbose=False, manual=False):
         super(BlobWarEnv, self).__init__()
-
         self.name = 'blobwar'
         self.manual = manual
-        self.core=Configuration(Board())
+        self.core=Configuration(Board(xsize=SIZE,ysize=SIZE))
+        self.n_players=2
+        self.current_player_num=0
+        self.xsize=self.core.board.shape[0]
+        self.ysize=self.core.board.shape[1]
 
-        xsize=self.core.board.shape[0]
-        ysize=self.core.board.shape[1]
-        nb_cells = self.core.board.shape[0] * self.core.board.shape[1]
-        self.observation_space = gym.spaces.Box(-1, 1, self.core.board.shape,dtype=int)  # board 8x8
-        ## Actions: No of players (2) ** Nb of cases
-        ### Encode actions as integers
-        self.action_space =gym.spaces.Discrete(xsize*xsize*ysize*ysize)
-
+        self.observation_space = gym.spaces.Box(-1, 1, (self.xsize +self.xsize**2*self.ysize,self.ysize)+(1,)) # board 8x8[3 type of positions) #Pass legal actions to observation vector
+        self.action_space =gym.spaces.Discrete((self.xsize**2)*(self.ysize**2))### Encode actions as integers ,the last action correspond to None move
+        self.verbose=verbose
     @property
     def observation(self):
-        return self.core.board.positions
-
+        positions_grid= self.core.board.positions.reshape((self.xsize,self.ysize,1))
+        legal_actions_grid=np.reshape(self.legal_actions,(self.xsize**2*self.ysize,self.ysize,1))
+        out = np.concatenate([positions_grid,legal_actions_grid])
+        return out
 
     @property
     def legal_actions(self):
-        legal_actions=[1 if self.core.check_move(self.map_action(action)) else -1 for action in range(self.action_space.n)]
+        legal_actions=[1 if self.core.check_move(self.decode_action(action)) else 0 for action in range(self.action_space.n)]
         return np.array(legal_actions)
-
-
-
-
     ###Check if the game is over
     def check_game_over(self):
 
@@ -66,14 +56,23 @@ class BlobWarEnv(gym.Env):
 
 
         return 0,False
-
     """
-    map an actoin from integer { 0,1..., xsize*ysize} to [[8,8] [8,8]]
-    
+    decode an action from integer { 0,1..., xsize*ysize} to [[8,8] [8,8]]
     """
-    def map_action(self, action):
+    def decode_action(self, action):
+        """
+        Decode an integer encoded action as a move from a position to another
+        :param action:
+        :type action:
+        :return:
+        :rtype:
+        """
         xsize=self.core.board.shape[0]
         ysize=self.core.board.shape[1]
+
+
+        # if action==(xsize**2) *(ysize**2): ##  move 4096 correspond to None
+        #     return None
 
         x1=int(action/((xsize)*(ysize**2)))
         action=action-((xsize)*(ysize**2))*x1
@@ -85,46 +84,61 @@ class BlobWarEnv(gym.Env):
         action - ((xsize)) * x2
 
         y2=action%xsize
+
+
+
+        if x1==0 and x2==xsize-1 and y1==0 and y2==ysize-1:
+            #Consider this particular action as none action (Condition x_size and y _size >3)
+            return None
+
         return [(x1,y1 ),(x2, y2)]
-
-
 
     @property
     def current_player(self):
         return min(2 - self.core.current_player, 2) -1   #1=>0, -1 =>1
 
-    def step(self, action):
-        move=self.map_action(action)
-
-        old_values=[self.core.adverse_value(),self.core.value()]
-
+    def step(self, action,update=True):
+        move=self.decode_action(action)
+        old_adverse_value, old_self_value = self.core.adverse_value(), self.core.value()
         if not self.core.check_move(move):
             done=True
             move=None
-            self.core.apply_movement(move)
-            new_values=[old_values[0]-1000,old_values[1]] ## Highly penalise bad moves
-
+            if update:
+                self.core.apply_movement(move)
+                new_conf = self.core
+            else:
+                new_conf = self.core.play(move)
+            new_adverse_value,new_self_value=old_adverse_value,old_self_value ## Highly penalise illegal moves
         else :
             r, done = self.check_game_over()
-            self.core.apply_movement(move)
+
+            if update:
+                self.core.apply_movement(move)
+                new_conf = self.core
+                new_adverse_value, new_self_value =new_conf.value(),new_conf.adverse_value()
+            else:
+                new_conf = self.core.play(move)
+                new_adverse_value, new_self_value = new_conf.adverse_value(), new_conf.value()
+
             ## The player become the adversary
-            new_values=[self.core.adverse_value(),self.core.value()]
 
-        rewards=[new_values[0]-old_values[0],new_values[1]-old_values[1]]
-        if self.core.current_player==-1: ##Reverse array of rewards
+        rewards=[new_adverse_value-old_adverse_value,new_self_value-old_self_value]
+
+        if new_conf.current_player==-1: ##Reverse array of rewards
             rewards.reverse()
+        self.current_player_num=self.current_player
+        return self.observation, rewards , done, {}
 
-        return self.core.board.positions, rewards , done, {}
 
     def reset(self):
-        self.board = [Token('.', 0)] * self.num_squares
-        self.players = [Player('1', Token('X', 1)), Player('2', Token('O', -1))]
-        self.core=Configuration(Board())
-
-        return self.observation
+       self.core=Configuration(Board())
+       self.current_player_num=self.current_player
+       obs=self.observation
+       return obs
 
     def render(self, mode='human', close=False, verbose=True):
         logger.debug(self.core.toString())
+        logger.debug(f'\nLegal actions: {[str(i) +":" + str(self.decode_action(i)) for i, o in enumerate(self.legal_actions) if o != 0]}')
 
 
 

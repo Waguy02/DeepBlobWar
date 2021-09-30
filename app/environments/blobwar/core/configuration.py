@@ -1,7 +1,8 @@
 import numpy as np
-from app.environments.blobwar.core.board import  Board
-from app.environments.blobwar.core.strategies.strategy import  Strategy
-from app.environments.blobwar.core.strategies.greedy import Greedy
+
+from  environments.blobwar.core.board import Board
+from  environments.blobwar.core.strategies.strategy import  Strategy
+from  environments.blobwar.core.strategies.greedy import Greedy
 class Configuration:
     def __init__(self,board:Board):
         """
@@ -22,12 +23,10 @@ class Configuration:
             self.display()
             print("Player"+str(playerId)+":"+playerName+ "("+icon+") is playing... His score is actually : ", self.value(), "\n")
 
-            attempt=None
             if (self.current_player==1):
                 attempt=player1.compute_next_nove(self)
             else :
                 attempt=player2.compute_next_nove(self)
-
 
             if  attempt!=None:
                 assert(self.check_move(attempt))
@@ -136,7 +135,7 @@ class Configuration:
         return jumps
 
     def duplicates(self)->[]:
-        ## A jump is tuple ([xi,yi], [xf,yf])
+        ## A duplication move is tuple ([xi,yi], [xf,yf])
         duplics = []
 
         ix_max, iy_max = self.board.shape[0], self.board.shape[1]
@@ -174,7 +173,7 @@ class Configuration:
 
 
     def check_move(self,mvt:[])->bool:
-        if mvt==None:
+        if mvt==None: ##Can perform empty move
             return True
         def check_in_board(x,y):
             return x>=0 and x<self.board.shape[0] and y>=0 and y<self.board.shape[1]
@@ -213,15 +212,16 @@ class Configuration:
 
 
     def apply_movement(self, mvt: []):
-        x_source, y_source = mvt[0]
-        x_dest, y_dest = mvt[1]
+        if mvt is not None:
+            x_source, y_source = mvt[0]
+            x_dest, y_dest = mvt[1]
 
-        self.board.positions[x_dest][y_dest] = self.current_player
-        if self.__is_jump__(mvt):
-            self.board.positions[x_source][y_source] = 0  ## Free the source case when performing a jump
+            self.board.positions[x_dest][y_dest] = self.current_player
+            if self.__is_jump__(mvt):
+                self.board.positions[x_source][y_source] = 0  ## Free the source case when performing a jump
 
-        for (x_adv, y_adv) in self.__adverse_neighbours__(x_dest, y_dest):
-            self.board.positions[x_adv][y_adv] = self.current_player
+            for (x_adv, y_adv) in self.__adverse_neighbours__(x_dest, y_dest):
+                self.board.positions[x_adv][y_adv] = self.current_player
 
         self.current_player = -1 * self.current_player
 
@@ -252,16 +252,11 @@ class Configuration:
         if non_zeros==len(flatten_positions):## ALl cases taken
             return True
 
-        # sum=flatten_positions.sum() ## Only  one player remainnng
-        # if np.abs(sum)==non_zeros:
-        #     return True
-
 
         return False
 
     def leading_player(self):
         value1=self.value()
-
         self.current_player*=-1
         value2=self.value()
 
@@ -272,18 +267,6 @@ class Configuration:
         if value1<value2:
             return -1*self.current_player
         return 0
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def __is_free__(self, ix, iy)->bool:
@@ -298,7 +281,7 @@ class Configuration:
         :type ix:
         :param iy:
         :type iy:
-        :return: The tupe of free neighbours
+        :return: The tuple of free neighbours
         :rtype:
         """
         ix_max, iy_max = self.board.shape[0], self.board.shape[1]
@@ -307,8 +290,6 @@ class Configuration:
         if distance==None:
             return self.__neighbours__(ix, iy, distance=1) + self.__neighbours__(ix, ix, distance=2) #Combine all neighbours
         
-        
-
         for dx in [-distance,0, distance]:
             for dy in [-distance,0,distance]:
                 if ix+dx<0 or ix+dx>=ix_max or iy+dy<0 or iy+dy>=iy_max:

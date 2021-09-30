@@ -1,5 +1,5 @@
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 tf.get_logger().setLevel('INFO')
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 

@@ -36,6 +36,7 @@ class TicTacToeEnv(gym.Env):
         self.grid_shape = (self.grid_length, self.grid_length)
         self.action_space = gym.spaces.Discrete(self.num_squares)
         self.observation_space = gym.spaces.Box(-1, 1, self.grid_shape+(2,))
+
         self.verbose = verbose
         
 
@@ -48,6 +49,12 @@ class TicTacToeEnv(gym.Env):
 
         la_grid = np.array(self.legal_actions).reshape(self.grid_shape)
         out = np.stack([position,la_grid], axis = -1)
+
+
+
+
+
+
         return out
 
     @property
@@ -58,6 +65,8 @@ class TicTacToeEnv(gym.Env):
                 legal_actions.append(1)
             else:
                 legal_actions.append(0)
+
+
         return np.array(legal_actions)
 
 
@@ -99,7 +108,6 @@ class TicTacToeEnv(gym.Env):
     def step(self, action):
         
         reward = [0,0]
-        
         # check move legality
         board = self.board
         

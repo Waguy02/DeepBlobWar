@@ -50,6 +50,9 @@ def main(args):
   for i, agent in enumerate(args.agents):
     if agent == 'human':
       agent_obj = Agent('human')
+    elif agent== 'greedy':
+      agent_obj = Agent('greedy')
+
     elif agent == 'rules':
       agent_obj = Agent('rules')
     elif agent == 'base':
@@ -91,6 +94,10 @@ def main(args):
         try:
           # for int actions
           action = int(action)
+
+
+
+
         except:
           # for MulitDiscrete action input as list TODO
           action = eval(action)

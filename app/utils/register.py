@@ -17,12 +17,17 @@ def get_environment(env_name):
         elif env_name in ('geschenkt'):
             from geschenkt.envs.geschenkt import GeschenktEnv
             return GeschenktEnv
+
+        elif env_name in ("blobwar"):
+            from blobwar.envs.blobwar import BlobWarEnv
+            return BlobWarEnv
         else:
             raise Exception(f'No environment found for {env_name}')
     except SyntaxError as e:
         print(e)
         raise Exception(f'Syntax Error for {env_name}!')
     except:
+
         raise Exception(f'Install the environment first using: \nbash scripts/install_env.sh {env_name}\nAlso ensure the environment is added to /utils/register.py')
     
 
@@ -38,10 +43,13 @@ def get_network_arch(env_name):
         from models.sushigo.models import CustomPolicy
         return CustomPolicy
     elif env_name in ('butterfly'):
-        from models.butterfly.models import CustomPolicy
+        from  models.butterfly.models import CustomPolicy
         return CustomPolicy
     elif env_name in ('geschenkt'):
-        from models.geschenkt.models import CustomPolicy
+        from  models.geschenkt.models import CustomPolicy
+        return CustomPolicy
+    elif env_name in ('blobwar'):
+        from  models.blobwar.models import CustomPolicy
         return CustomPolicy
     else:
         raise Exception(f'No model architectures found for {env_name}')

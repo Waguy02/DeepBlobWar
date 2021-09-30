@@ -79,6 +79,7 @@ class SushiGoEnv(gym.Env):
 
         ret = np.append(ret, self.legal_actions)
 
+
         return ret
 
     @property

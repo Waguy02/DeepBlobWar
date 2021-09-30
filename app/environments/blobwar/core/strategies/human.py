@@ -1,6 +1,7 @@
 
 
-from app.environments.blobwar.core.strategies.strategy import*
+
+from  environments.blobwar.core.strategies.strategy import*
 
 
 class Human(Strategy):

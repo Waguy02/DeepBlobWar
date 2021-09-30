@@ -1,90 +1,11 @@
-<!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
-<!-- PROJECT LOGO -->
-<br />
-<p align="center">
-  <a href="https://github.com/davidADSP/SIMPLE">
-    <img src="images/logo.png" alt="Logo" height="120">
-  </a>
-
-  <!-- <h3 align="center">SIMPLE</h3> -->
-
-  <p align="center">
-    Selfplay In MultiPlayer Environments
-    <!-- <br /> -->
-    <!-- <a href="https://github.com/davidADSP/SIMPLE"><strong>Explore the docs »</strong></a> -->
-    <br />
-    <!-- <a href="https://github.com/davidADSP/SIMPLE">View Demo</a> -->
-    ·
-    <a href="https://github.com/davidADSP/SIMPLE/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/davidADSP/SIMPLE/issues">Request Feature</a>
-  </p>
-</p>
-<br>
-
-
-<!-- TABLE OF CONTENTS -->
-
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#tutorial">Tutorial</a></li>
-      <ul>
-        <li><a href="#prerequisites">Quickstart</a></li>
-        <li><a href="#prerequisites">Tensorboard</a></li>
-        <li><a href="#custom-environments">Custom Environments</a></li>
-        <li><a href="#parallelisation">Parallelisation</a></li>
-      </ul>
-    </li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-
-
-
-<br>
-
----
-<!-- ABOUT THE PROJECT -->
-## About The Project
-
-<img src="images/diagram.png" alt="SIMPLE Diagram" width='100%'>
-
-This project allows you to train AI agents on custom-built multiplayer environments, through self-play reinforcement learning.
-
-It implements [Proximal Policy Optimisation (PPO)](https://openai.com/blog/openai-baselines-ppo/), with a built-in wrapper around the multiplayer environments that handles the loading and action-taking of opponents in the environment. The wrapper delays the reward back to the PPO agent, until all opponents have taken their turn. In essence, it converts the multiplayer environment into a single-player environment that is constantly evolving as new versions of the policy network are added to the network bank.
-
-To learn more, check out the accompanying [blog post](https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717).
-
-This guide explains how to get started with the repo, add new custom environments and tune the hyperparameters of the system.
-
-Have fun!
-
----
-<!-- GETTING STARTED -->
-
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
+In this project, we propose an implementation of the board game called BlobWar.  We have realized an Artificial Intelligence based on reinforcement learning to improve the performance of the computer in this game.
+
+
+The board contains blue and red pieces (also called blobs). Each player takes a turn. On each turn the current player chooses one of his pieces and moves it. Any piece may move to an adjacent empty square, including diagonally, duplicating itself and creating a new piece of the same color. A piece can also move two squares, i.e. max(∆row,∆column) = 2. In this case, there is no duplication and the pawn is said to make a "jump". Once arrived on its destination a pawn transforms all the neighboring pawns of its opponent into pawns of its own color. The game stops as soon as a player cannot play. The player with the most pieces on the board wins the game.
+
+As an example, the two pictures below illustrate a jump from the blue checker in square 32 to the square 
 
 ### Prerequisites
 
@@ -101,9 +22,7 @@ Install [Docker](https://github.com/davidADSP/SIMPLE/issues) and [Docker Compose
    ```sh
    docker-compose up -d
    ```
-3. Choose an environment to install in the container (`tictactoe`, `connect4`, `sushigo`, `geschenkt`, and `butterfly` are currently implemented)
-   ```sh
-   bash ./scripts/install_env.sh sushigo
+
    ```
 
 ---

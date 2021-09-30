@@ -19,7 +19,7 @@ class Token():
     def __init__(self, symbol, number):
         self.number = number
         self.symbol = symbol
-        
+             
         
 class Connect4Env(gym.Env):
     metadata = {'render.modes': ['human']}
