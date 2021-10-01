@@ -47,27 +47,27 @@ class CustomPolicy(ActorCriticPolicy):
         return self.sess.run(self.value_flat, {self.obs_ph: obs})
 
 def value_head(y):
-    y = convolutional(y, 2, 1)
+    y = convolutional(y, 3, (XSIZE-3,YSIZE-3),name="")
     y = Flatten()(y)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')
     q = dense(y, ACTIONS, batch_norm=False, activation='tanh', name='q')
     return vf, q
 
 def policy_head(y,legal_actions):
-    y = convolutional(y, 3, (XSIZE-1,YSIZE-1),name="POLICY_CONV")
+    y = convolutional(y, 4, XSIZE-1,name="POLICY_CONV")
     y = Flatten()(y)
     policy = dense(y, ACTIONS, batch_norm=False, name='pi')
-
     mask=Flatten()(legal_actions)
-
     mask = Lambda(lambda x: (1 - x) * -1e8)(mask)
     policy = Add()([policy, mask])
 
     return policy
 
 def resnet_extractor(y, **kwargs):
-    y = convolutional(y, 3,(XSIZE-1, YSIZE-1),name="RESNET_CONV")
-    # y = residual(y,  XSIZE-1, YSIZE-1)
+    y = convolutional(y, 32,SIZE-1,name="RESNET_CONV")
+    y = residual(y, 32,SIZE - 1)
+    y = residual(y, 32, SIZE - 1)
+    y = residual(y, 32, SIZE - 1)
     return y
 
 def convolutional(y, filters, kernel_size,name=None):
@@ -120,6 +120,7 @@ def dense(y, filters, batch_norm=True, activation='relu', name=None):
     return y
 
 def split_input(obs):
+    ##Extract observation and legal actions from env obs (env obs = observation  + legal actions)
     observations=obs[:,:XSIZE ,:,:]
     legal_actions=obs[ :,XSIZE:,:,:] ##The none action is always legal
     return   observations,legal_actions

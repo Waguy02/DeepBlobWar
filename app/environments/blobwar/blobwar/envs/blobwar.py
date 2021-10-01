@@ -132,7 +132,7 @@ class BlobWarEnv(gym.Env):
         if player_num==0:
             rewards=[new_self_value-old_self_value,new_adverse_value-old_adverse_value]
         else:
-            rewards = [new_adverse_value - old_adverse_value,new_self_value - old_self_value]
+                rewards = [new_adverse_value - old_adverse_value,new_self_value - old_self_value]
 
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
