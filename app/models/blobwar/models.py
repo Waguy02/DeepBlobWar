@@ -22,8 +22,8 @@ class CustomPolicy(ActorCriticPolicy):
     def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **kwargs):
         super(CustomPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse, scale=True)
         with tf.variable_scope("model", reuse=reuse):
-            obs, legal_actions = split_input(self.processed_obs)
-            extracted_features = resnet_extractor(obs, **kwargs)
+            observations, legal_actions = split_input(self.processed_obs)
+            extracted_features = resnet_extractor(observations, **kwargs)
             self._policy = policy_head(extracted_features,legal_actions)
             self._value_fn, self.q_value = value_head(extracted_features)
             self._proba_distribution = CategoricalProbabilityDistribution(self._policy)
@@ -47,14 +47,14 @@ class CustomPolicy(ActorCriticPolicy):
         return self.sess.run(self.value_flat, {self.obs_ph: obs})
 
 def value_head(y):
-    y = convolutional(y, 3, (XSIZE-3,YSIZE-3),name="")
+    y = convolutional(y, 3, SIZE-3,name="")
     y = Flatten()(y)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')
     q = dense(y, ACTIONS, batch_norm=False, activation='tanh', name='q')
     return vf, q
 
 def policy_head(y,legal_actions):
-    y = convolutional(y, 4, XSIZE-1,name="POLICY_CONV")
+    y = convolutional(y, 4, SIZE-1,name="POLICY_CONV")
     y = Flatten()(y)
     policy = dense(y, ACTIONS, batch_norm=False, name='pi')
     mask=Flatten()(legal_actions)
