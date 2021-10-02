@@ -66,8 +66,9 @@ def policy_head(y,legal_actions):
 def resnet_extractor(y, **kwargs):
     y = convolutional(y, 32,SIZE-1,name="RESNET_CONV")
     y = residual(y, 32,SIZE - 1)
-    y = residual(y, 32, SIZE - 1)
-    y = residual(y, 32, SIZE - 1)
+    # y = residual(y, 32, SIZE - 1)
+    # y = residual(y, 32, SIZE - 1)
+
     return y
 
 def convolutional(y, filters, kernel_size,name=None):

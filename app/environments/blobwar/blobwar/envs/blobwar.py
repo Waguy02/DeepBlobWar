@@ -49,7 +49,7 @@ class BlobWarEnv(gym.Env):
 
         is_over=self.core.game_over()
         if is_over:
-            if self.core.leading_player()==self.core.current_player:
+            if self.core.leading_player()!=self.core.current_player:
                 return 1,True ## If the current player is winnig
             else:
                 return 0,True ## otherwise
