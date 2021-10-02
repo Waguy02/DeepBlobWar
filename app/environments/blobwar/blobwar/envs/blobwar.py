@@ -126,16 +126,20 @@ class BlobWarEnv(gym.Env):
             else:
                 new_conf = self.core.play(move)
                 new_adverse_value, new_self_value = new_conf.value(),new_conf.adverse_value()
-
-
+        reward=self.normalize_reward(new_self_value-old_self_value)
 
         if player_num==0:
-            rewards=[new_self_value-old_self_value,new_adverse_value-old_adverse_value]
+            rewards=[reward,-reward]
         else:
-                rewards = [new_adverse_value - old_adverse_value,new_self_value - old_self_value]
+            rewards = [-reward, reward]
 
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
+
+
+
+    def normalize_reward(self,reward):
+        return reward/(self.xsize*self.ysize)
 
 
     def reset(self):
