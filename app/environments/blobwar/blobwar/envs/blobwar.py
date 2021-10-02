@@ -106,6 +106,8 @@ class BlobWarEnv(gym.Env):
     def step(self, action,update=True):
         move=self.decode_action(action)
         old_adverse_value, old_self_value = self.core.adverse_value(), self.core.value()
+
+
         player_num=self.current_player ##The player num before move beginning
 
         if not self.core.check_move(move):
@@ -116,17 +118,23 @@ class BlobWarEnv(gym.Env):
                 pass
             else:
                 pass
-            new_adverse_value,new_self_value=old_adverse_value,old_self_value ## Highly penalise illegal moves
+            rewards=[0,0]
+            rewards[player_num]=-10
+
         else :
             r, done = self.check_game_over()
+
+
             if update:
                 self.core.apply_movement(move)
                 new_conf = self.core
-                new_adverse_value, new_self_value =new_conf.value(),new_conf.adverse_value()
             else:
                 new_conf = self.core.play(move)
-                new_adverse_value, new_self_value = new_conf.value(),new_conf.adverse_value()
-        reward=self.normalize_reward(new_self_value-old_self_value)
+
+
+            new_player_value=new_conf.adverse_value()
+
+        reward=self.normalize_reward(new_player_value-old_player_value)
 
         if player_num==0:
             rewards=[reward,-reward]
