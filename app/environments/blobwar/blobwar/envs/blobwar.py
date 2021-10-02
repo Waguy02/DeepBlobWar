@@ -105,11 +105,8 @@ class BlobWarEnv(gym.Env):
 
     def step(self, action,update=True):
         move=self.decode_action(action)
-        old_adverse_value, old_self_value = self.core.adverse_value(), self.core.value()
-
-
+        old_value=self.core.value()
         player_num=self.current_player ##The player num before move beginning
-
         if not self.core.check_move(move):
             done=True
             move=None
@@ -120,24 +117,18 @@ class BlobWarEnv(gym.Env):
                 pass
             rewards=[1,1]
             rewards[player_num]=-1
-
         else :
-            r, done = self.check_game_over()
-
-
             if update:
                 self.core.apply_movement(move)
                 new_conf = self.core
             else:
                 new_conf = self.core.play(move)
+            new_value = new_conf.adverse_value()
+            reward=self.normalize_reward(new_value-old_value)
+            rewards=[-reward,-reward]
+            rewards[player_num]=-1*rewards[player_num]
+            r, done = self.check_game_over()
 
-
-            new_player_value=new_conf.adverse_value()
-
-        # reward=self.normalize_reward(new_player_value-old_player_value)
-
-        rewards=[-r,-r]
-        rewards[player_num]=r
 
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
