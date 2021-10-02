@@ -1,1 +1,1 @@
-docker-compose exec app python3 train.py -r -e tictactoe
+docker-compose exec app mpirun -np 4  python3 train.py -r -e tictactoe
