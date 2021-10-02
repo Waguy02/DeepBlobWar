@@ -1,2 +1,2 @@
-pip install -r ../app/requirements.txt
-pip install -e ../app/environments/blobwar
+pip3 install -r ../app/requirements.txt
+pip3 install -e ../app/environments/blobwar
