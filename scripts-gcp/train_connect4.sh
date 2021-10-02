@@ -1,1 +1,1 @@
-sudo docker-compose exec python3 train.py -r -e connect4
+sudo docker-compose exec app  python3 train.py -r -e tictactoe
