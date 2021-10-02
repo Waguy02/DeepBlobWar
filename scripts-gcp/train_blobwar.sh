@@ -1,0 +1,1 @@
+mpirun -np 4 python ../app/train.py -r -v -e blobwar

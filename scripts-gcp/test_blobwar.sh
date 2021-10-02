@@ -1,0 +1,1 @@
+python ../app/test.py -d -g 1 -a greedy best_model  -e blobwar
