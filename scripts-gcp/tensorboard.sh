@@ -1,1 +1,1 @@
-docker-compose exec app tensorboard --logdir ../app/logs
+sudo  docker-compose exec app tensorboard --logdir ../app/logs
