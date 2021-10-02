@@ -1,2 +1,2 @@
-pip3 install -r ../app/requirements.txt
-pip3 install -e ../app/environments/blobwar
+docker-compose up -d
+docker-compose exec app pip3 install -e ./environments/blobwar
