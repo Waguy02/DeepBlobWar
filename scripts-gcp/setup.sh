@@ -1,2 +1,2 @@
 sudo docker-compose up -d
-sudo docker-compose exec app sudo pip3 install -e ./environments/blobwar
+sudo docker-compose exec app pip3 install -e ./environments/blobwar
