@@ -31,7 +31,7 @@ def main(args):
   rank = MPI.COMM_WORLD.Get_rank()
 
   model_dir = os.path.join(config.MODELDIR, args.env_name)
-
+  log_dir = args.log_dir if args.log_dir else config.LOGDIR
   if rank == 0:
     try:
       os.makedirs(model_dir)
@@ -39,7 +39,7 @@ def main(args):
       pass
     if args.reset:
       reset_files(model_dir)
-    logger.configure(config.LOGDIR)
+    logger.configure(log_dir)
   else:
     logger.configure(format_strs=[])
 
@@ -48,6 +48,8 @@ def main(args):
   else:
     time.sleep(5)
     logger.set_level(config.INFO)
+
+
 
   workerseed = args.seed + 10000 * MPI.COMM_WORLD.Get_rank()
   set_global_seeds(workerseed)
@@ -68,7 +70,7 @@ def main(args):
       , 'adam_epsilon':args.adam_epsilon
       , 'schedule':'linear'
       , 'verbose':1
-      , 'tensorboard_log':config.LOGDIR
+      , 'tensorboard_log':log_dir
   }
 
   time.sleep(5) # allow time for the base model to be saved out when the environment is created
@@ -85,7 +87,7 @@ def main(args):
   callback_args = {
     'eval_env': selfplay_wrapper(base_env)(opponent_type = args.opponent_type, verbose = args.verbose),
     'best_model_save_path' : config.TMPMODELDIR,
-    'log_path' : config.LOGDIR,
+    'log_path' : log_dir,
     'eval_freq' : args.eval_freq,
     'n_eval_episodes' : args.n_eval_episodes,
     'deterministic' : False,
@@ -166,7 +168,9 @@ def cli() -> None:
   parser.add_argument("--lam", "-l",  type = float, default = 0.95
             , help="The value of lambda in PPO")
   parser.add_argument("--adam_epsilon", "-a",  type = float, default = 1e-05
-            , help="The value of epsilon in the Adam optimiser")
+            , help="The value of epsilon in the Adam optimiser"),
+  parser.add_argument("--log_dir", "-log", type=str, default=None
+                      , help="The default directory for tensorboard logs")
 
   # Extract args
   args = parser.parse_args()

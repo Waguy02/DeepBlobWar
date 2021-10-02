@@ -68,7 +68,7 @@ class Agent():
         logger.debug(f'Value {value:.2f}')
 
       # logger.debug(f'\n action probs:{action_probs} ')
-      self.print_top_actions(action_probs,env=env)
+      self.print_top_actions(action_probs)
 
       if mask_invalid_actions:
         action_probs = mask_actions(env.legal_actions, action_probs)

@@ -142,6 +142,7 @@ class BlobWarEnv(gym.Env):
        self.core=Configuration(Board())
        self.current_player_num=self.current_player
        obs=self.observation
+       self.done=False
        return obs
 
     def render(self, mode='human', close=False, verbose=True):

@@ -1,3 +1,0 @@
-Logging to logs
-
-Setting up the selfplay training environment opponents...
