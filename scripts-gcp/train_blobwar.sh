@@ -1,1 +1,1 @@
-mpirun -np 4 python ../app/train.py -r -v -e blobwar
+docker-compose exec app mpirun -np 4 python3 train.py -v -e blobwar
