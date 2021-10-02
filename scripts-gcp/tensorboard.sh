@@ -1,1 +1,1 @@
-sudo  docker-compose exec app tensorboard  --host "34.81.16.135" --port 6006 --logdir ../app/logs
+sudo  docker-compose exec app tensorboard  --host 0.0.0.0 --port 6006 --logdir ../app/logs
