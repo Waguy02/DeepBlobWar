@@ -1,1 +1,0 @@
-docker-compose exec app python3 test.py -d -g 1 -a best_model human -e tictactoe
