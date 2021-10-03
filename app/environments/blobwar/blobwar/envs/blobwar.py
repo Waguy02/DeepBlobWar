@@ -115,13 +115,13 @@ class BlobWarEnv(gym.Env):
                 pass
             else:
                 pass
-            reward=self.normalize_reward(1)
+            reward=1
             rewards=[reward,reward]
             rewards[player_num]=-1*rewards[player_num]
         else :
             self.core.apply_movement(move)
             new_value = self.core.adverse_value()
-            reward=self.normalize_reward(new_value-old_value)
+            reward=new_value-old_value
             rewards=[-reward,-reward]
             rewards[player_num]=-1*rewards[player_num]
             r, done = self.check_game_over()
