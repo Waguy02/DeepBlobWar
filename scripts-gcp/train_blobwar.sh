@@ -1,1 +1,1 @@
-docker-compose exec app mpirun -np 4 python3 train.py -e blobwar --o best
+docker-compose exec app mpirun -np 4 python3 train.py -e blobwar -o best
