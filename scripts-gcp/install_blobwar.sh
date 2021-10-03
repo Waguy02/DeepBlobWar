@@ -1,2 +1,2 @@
 sudo chmod -R 777 ../*
-sudo docker-compose exec app pip3 install -e ./environments/blobwar
+sudo pip3 install -e ../app/environments/blobwar
