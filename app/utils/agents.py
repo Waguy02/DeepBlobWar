@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from environments.blobwar.core.strategies.greedy import Greedy
 
 from environments.blobwar.constants import SIZE
 
@@ -30,6 +31,11 @@ class Agent():
       self.model = model
       self.points = 0
 
+      self.greedies_strategies={"blobwar":Greedy()}
+
+
+
+
 
 
   def print_top_actions(self, action_probs,env=None):
@@ -44,6 +50,11 @@ class Agent():
     logger.debug(f"Top 5 actions: {[str(formatter(i)) + ': ' + str(round(a, 5)) for i, a in zip(top5_action_idx, top5_actions)]}")
 
   def choose_action(self, env, choose_best_action, mask_invalid_actions):
+
+
+
+
+
       if self.name=="greedy":
         return self.greedy(env, choose_best_action, mask_invalid_actions)
 
@@ -78,21 +89,13 @@ class Agent():
 
 
   def greedy(self, env, choose_best_action, mask_invalid_actions):
-      max_action = None
-      max_reward = -1
+      if env.name=="blobwar":
+          greedy=self.greedies_strategies["blobwar"]
+          max_action=env.encode_action(greedy.compute_next_move(env.core))
+          return max_action
 
-      legal_actions=env.legal_actions
-      for action in range(len(legal_actions)):
-          if legal_actions[action]==0:
-              continue
-          obs, rewards, done, _ = env.step(action,update=False)
-          reward=rewards[env.current_player]
-          if reward >max_reward:
-              max_action=action
-              max_reward=reward
-              # logger.debug(f'Max reward: {max_reward}')
-
-      return max_action
+      else:
+          raise Exception("Greedy Strategy not implemented for  "+env.name)
 
 
 

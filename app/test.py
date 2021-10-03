@@ -36,13 +36,9 @@ def main(args):
   env.seed(args.seed)
 
 
-  if args.env_name=="blobwar":
-    human_blobwar = Human()
-    # print("Testing encoding")
-    # for action in range((env.xsize ** 2) * env.ysize ** 2):
-    #   decoded = env.decode_action(action)
-    #   recoded = env.encode_action(decoded)
-    #   print(action, env.decode_action(action), recoded)
+
+
+
 
   total_rewards = {}
 
@@ -60,13 +56,12 @@ def main(args):
     raise Exception(f'{len(args.agents)} players specified but this is a {env.n_players} player game!')
 
 
-
-
   for i, agent in enumerate(args.agents):
     if agent == 'human':
       agent_obj = Agent('human')
     elif agent== 'greedy':
       agent_obj = Agent('greedy')
+
 
     elif agent == 'rules':
       agent_obj = Agent('rules')
@@ -78,7 +73,10 @@ def main(args):
       agent_obj = Agent(agent, ppo_model)
     agents.append(agent_obj)
     total_rewards[agent_obj.id] = 0
-  
+
+  if args.env_name == "blobwar":
+    human_blobwar = Human()
+
   #play games
   logger.info(f'\nPlaying {args.games} games...')
   for game in range(args.games):
@@ -106,6 +104,7 @@ def main(args):
 
       if current_player.name == 'human':
         if args.env_name == "blobwar":
+
           move= human_blobwar.compute_next_move(env.core)
           action=env.encode_action(move)
         else:

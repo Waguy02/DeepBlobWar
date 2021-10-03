@@ -70,6 +70,9 @@ class BlobWarEnv(gym.Env):
         :return:
         :rtype:
         """
+        if action is None:
+            return None
+
         xsize=self.core.board.shape[0]
         ysize=self.core.board.shape[1]
 

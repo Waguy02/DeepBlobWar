@@ -11,3 +11,4 @@ LOGDIR = os.path.join(ROOT_DIR,"logs")
 RESULTSPATH = os.path.join(ROOT_DIR,'viz/results.csv')
 TMPMODELDIR = os.path.join(ROOT_DIR,"zoo/tmp")
 MODELDIR = os.path.join(ROOT_DIR,"zoo")
+
