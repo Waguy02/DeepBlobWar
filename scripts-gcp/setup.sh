@@ -1,4 +1,4 @@
-conda create --name tf1 python=3.8
+conda create --name tf1 python=3.7
 conda activate tf1
 #conda install -c conda-forge tensorflow-gpu=1.15
 #conda install -c conda-forge tensorboardx -y
@@ -15,4 +15,4 @@ conda activate tf1
 apt-get -y install cmake libopenmpi-dev python3-dev zlib1g-dev libgl1-mesa-dev
 pip3 install --upgrade pip
 pip3 install --upgrade setuptools
-pip3 install --upgrade -r ../app/requirements.txt
+pip3 install -r ../app/requirements.txt
