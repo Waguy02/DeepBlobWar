@@ -15,6 +15,7 @@ class Configuration:
         self.player1_name=""
         self.player2_name= ""
 
+
     def battle(self,player1:Strategy,player2:Strategy):
         self.player1_name=player1.name()
         self.player2_name = player2.name()
@@ -62,7 +63,7 @@ class Configuration:
     def toString(self,player1ID="player1",player2ID="player"):
         space_two = "   "
         space_one = " "
-        output = "\n"+space_two + space_one
+        output = "Board\n"+space_two + space_one
         for iy in range(self.board.shape[1]):
             output += str(iy) + space_one
 

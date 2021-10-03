@@ -43,6 +43,9 @@ class BlobWarEnv(gym.Env):
     @property
     def legal_actions(self):
         legal_actions=[1 if self.core.check_move(self.decode_action(action)) else 0 for action in range(self.action_space.n)]
+        if np.sum(legal_actions)>1:
+            legal_actions[self.encode_action(None)]=0 ##None action is only legal when it is the only possible action
+
         return np.array(legal_actions)
     ###Check if the game is over
     def check_game_over(self):
@@ -89,7 +92,7 @@ class BlobWarEnv(gym.Env):
 
     def encode_action(self,move):
         if move==None:
-            return [(0,0),(self.xsize-1,self.ysize-1)]
+            return self.encode_action([(0,0),(self.xsize-1,self.ysize-1)])
 
 
         x1,y1=move[0]
@@ -125,15 +128,13 @@ class BlobWarEnv(gym.Env):
             rewards=[-reward,-reward]
             rewards[player_num]=-1*rewards[player_num]
             r, done = self.check_game_over()
-
-
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
 
 
-
-    def normalize_reward(self,reward):
-        return float(reward)/float((self.xsize*self.ysize))
+    #
+    # def normalize_reward(self,reward):
+    #     return float(reward)/float((self.xsize*self.ysize))
 
 
     def reset(self):

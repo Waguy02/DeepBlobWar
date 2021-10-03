@@ -31,11 +31,8 @@ class Agent():
       self.points = 0
 
   def format_action(self, action):
-
-      return action
       xsize = SIZE
       ysize = SIZE
-
       x1 = int(action / ((xsize) * (ysize ** 2)))
       action = action - ((xsize) * (ysize ** 2)) * x1
 
@@ -45,7 +42,7 @@ class Agent():
       x2 = int(action / (xsize))
       action - ((xsize)) * x2
       y2 = action % xsize
-      return [(x1, y1), (x2, y2)]
+      return str(action )+":"+str([(x1, y1), (x2, y2)])
 
 
   def print_top_actions(self, action_probs):
