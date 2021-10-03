@@ -171,17 +171,7 @@ class Configuration:
                             continue
                         if not self.check_move(mvt):
                             bad_moves.append(mvt)
-
         return bad_moves
-
-
-
-
-
-
-
-
-
 
     def check_move(self,mvt:[])->bool:
         if mvt==None: ##Can perform empty move
@@ -207,7 +197,6 @@ class Configuration:
             return False
 
         return True
-
 
     def movements(self)->[]:
         return self.duplicates()+self.jumps()
