@@ -131,8 +131,6 @@ class Configuration:
     def adverse_value(self):
         return -1*self.value()
 
-
-
     def jumps(self)->[]:
         ## A jump is tuple ([xi,yi], [xf,yf])
         jumps=[]
