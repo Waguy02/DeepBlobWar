@@ -1,2 +1,1 @@
-tensorboard --logdir ../app/logs --port 6006
-kill tensorboard
+docker-compose exec app tensorboard --logdir ./logs

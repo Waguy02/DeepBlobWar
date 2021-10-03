@@ -1,1 +1,1 @@
-sudo mpirun -np 8 --allow-run-as-root  python3 ../app/train.py -v -r -e blobwar
+docker-compose exec app mpirun -np 4 python3 train.py -v -e blobwar
