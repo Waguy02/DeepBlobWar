@@ -1,1 +1,1 @@
-sudo mpirun -np 8 python3 ../app/train.py -v -r -e blobwar
+sudo mpirun  --allow-run-as-root -np 8 python3 ../app/train.py -v -r -e blobwar
