@@ -13,7 +13,4 @@
 #conda install -c anaconda scipy=1.5.3 -y
 #conda install -c anaconda h5py=2.10.0 -y
 
-conda install stable-baselines[mpi]==2.10.1
-conda install jupyter==1.0.0
-conda install jupyterlab==3.0.0
-conda install pillow
+pip3 install -r ../app/requirements.txt
