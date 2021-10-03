@@ -1,1 +1,1 @@
-sudo pip install -r ../app/requirements.txt
+sudo pip3 install -r ../app/requirements.txt
