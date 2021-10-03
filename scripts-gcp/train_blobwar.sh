@@ -1,1 +1,1 @@
-docker-compose exec python3 train.py -v -r -e blobwar  -ne 50
+docker-compose exec python3 train.py -v -r -e blobwar  -o best
