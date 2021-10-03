@@ -13,4 +13,4 @@
 #conda install -c anaconda scipy=1.5.3 -y
 #conda install -c anaconda h5py=2.10.0 -y
 
-pip3 install -r ../app/requirements.txt
+conda install --file ../app/requirements.txt
