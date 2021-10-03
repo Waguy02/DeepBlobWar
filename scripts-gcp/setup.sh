@@ -12,5 +12,7 @@
 #conda install -c conda-forge scikit-image -y
 #conda install -c anaconda scipy=1.5.3 -y
 #conda install -c anaconda h5py=2.10.0 -y
-
-conda install --file ../app/requirements.txt
+apt-get -y install cmake libopenmpi-dev python3-dev zlib1g-dev libgl1-mesa-dev
+pip3 install --upgrade pip
+pip3 install --upgrade setuptools
+pip3 install -r ../app/requirements.txt
