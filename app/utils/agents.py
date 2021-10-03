@@ -65,7 +65,7 @@ class Agent():
         
       action = np.argmax(action_probs)
 
-      formatter = self.format_action
+      formatter = env.decode_action  if env is not None and env.name=="blobward" else lambda action:action
 
       logger.debug(f'Best action {formatter(action)}')
 

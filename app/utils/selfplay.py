@@ -5,6 +5,7 @@ import random
 from utils.files import load_model, load_all_models, get_best_model_name
 from utils.agents import Agent
 from environments.blobwar.constants import SIZE
+
 import config
 
 from stable_baselines import logger
@@ -32,23 +33,23 @@ def selfplay_wrapper(env):
                     start = 0
                     end = len(self.opponent_models) - 1
                     i = random.randint(start, end)
-                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i]) 
+                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i])
 
                 elif self.opponent_type == 'best':
-                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])  
+                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])
 
                 elif self.opponent_type == 'mostly_best':
                     j = random.uniform(0,1)
                     if j < 0.8:
-                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])  
+                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])
                     else:
                         start = 0
                         end = len(self.opponent_models) - 1
                         i = random.randint(start, end)
-                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i])  
+                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i])
 
                 elif self.opponent_type == 'base':
-                    self.opponent_agent = Agent('base', self.opponent_models[0])  
+                    self.opponent_agent = Agent('base', self.opponent_models[0])
 
             self.agent_player_num = np.random.choice(self.n_players)
             self.agents = [self.opponent_agent] * self.n_players
@@ -64,7 +65,7 @@ def selfplay_wrapper(env):
             super(SelfPlayEnv, self).reset()
             self.setup_opponents()
 
-            if self.current_player_num != self.agent_player_num:   
+            if self.current_player_num != self.agent_player_num:
                 self.continue_game()
 
             return self.observation
@@ -93,8 +94,6 @@ def selfplay_wrapper(env):
         def step(self, action):
             self.render()
             observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
-
-            formatted_action=action if self.action_formatter is None else "f"
             logger.debug(f'Action played by agent: {action}')
             logger.debug(f'Rewards: {reward}')
             logger.debug(f'Done: {done}')
@@ -112,63 +111,121 @@ def selfplay_wrapper(env):
                 self.render()
 
             return observation, agent_reward, done, {}
-
-
-    class SelfPlayEnvBlobwar(SelfPlayEnv):
+    class SelfPlayEnvBlobwar(env):
         """:
         Special SelfPlay For blobwar game. Some modifications. overriding of continue game and step methods to handle partial rewards.
         """
         # wrapper over the normal single player env, but loads the best self play model
+        # wrapper over the normal single player env, but loads the best self play model
         def __init__(self, opponent_type, verbose):
-            super(SelfPlayEnv, self).__init__(opponent_type,verbose)
+            super(SelfPlayEnvBlobwar, self).__init__(verbose)
+            self.opponent_type = opponent_type
+            self.opponent_models = load_all_models(self)
+            self.best_model_name = get_best_model_name(self.name)
+
+        def setup_opponents(self):
+            if self.opponent_type == 'rules':
+                self.opponent_agent = Agent('rules')
+            else:
+                # incremental load of new model
+                best_model_name = get_best_model_name(self.name)
+                if self.best_model_name != best_model_name:
+                    self.opponent_models.append(load_model(self, best_model_name))
+                    self.best_model_name = best_model_name
+
+                if self.opponent_type == 'random':
+                    start = 0
+                    end = len(self.opponent_models) - 1
+                    i = random.randint(start, end)
+                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i])
+
+                elif self.opponent_type == 'best':
+                    self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])
+
+                elif self.opponent_type == 'mostly_best':
+                    j = random.uniform(0, 1)
+                    if j < 0.8:
+                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[-1])
+                    else:
+                        start = 0
+                        end = len(self.opponent_models) - 1
+                        i = random.randint(start, end)
+                        self.opponent_agent = Agent('ppo_opponent', self.opponent_models[i])
+
+                elif self.opponent_type == 'base':
+                    self.opponent_agent = Agent('base', self.opponent_models[0])
+
+            self.agent_player_num = np.random.choice(self.n_players)
+            self.agents = [self.opponent_agent] * self.n_players
+            self.agents[self.agent_player_num] = None
+            try:
+                # if self.players is defined on the base environment
+                logger.debug(f'Agent plays as Player {self.players[self.agent_player_num].id}')
+            except:
+                pass
+
+        def reset(self):
+            super(SelfPlayEnvBlobwar, self).reset()
+            self.setup_opponents()
+
+            if self.current_player_num != self.agent_player_num:
+                self.continue_game()
+
+            return self.observation
+
+        @property
+        def current_agent(self):
+            return self.agents[self.current_player_num]
 
 
-        def format_action(self, action):
-            xsize = SIZE
-            ysize = SIZE
-            x1 = int(action / ((xsize) * (ysize ** 2)))
-            action = action - ((xsize) * (ysize ** 2)) * x1
-            y1 = int(action / (xsize * (ysize)))
-            action = action - ((xsize) * (ysize)) * y1
-
-            x2 = int(action / (xsize))
-            action - ((xsize)) * x2
-            y2 = action % xsize
-            return str([(x1, y1), (x2, y2)])
+        # def format_action(self, action):
+        #     xsize = SIZE
+        #     ysize = SIZE
+        #     x1 = int(action / ((xsize) * (ysize ** 2)))
+        #     action = action - ((xsize) * (ysize ** 2)) * x1
+        #     y1 = int(action / (xsize * (ysize)))
+        #     action = action - ((xsize) * (ysize)) * y1
+        #
+        #     x2 = int(action / (xsize))
+        #     action - ((xsize)) * x2
+        #     y2 = action % xsize
+        #     return str([(x1, y1), (x2, y2)])
 
         def continue_game(self):
-            observation = None
-            done = None
-
             """Working with partial rewards and at the end of the round, sum up reward amount step"""
-            partial_rewards=[0 for _ in range(len(self.agents))]
-            while self.current_player_num != self.agent_player_num:
+            adversary_round_rewards=[0,0]
+            if self.current_player_num != self.agent_player_num:
                 self.render()
                 action = self.current_agent.choose_action(self, choose_best_action = False, mask_invalid_actions = False)
-                observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
+                observation, reward, done, _ = super(SelfPlayEnvBlobwar, self).step(action)
+                formatted_action = super(SelfPlayEnvBlobwar, self).decode_action(action)
+                logger.debug(f'Action played by adversary({"o" if self.agent_player_num==0 else "x"}): {formatted_action}')
                 for i in range(len(self.agents)):
-                    partial_rewards[i]+=reward[i]
-                logger.debug(f'Rewards: {reward}')
-                logger.debug(f'Done: {done}')
-                if done:
-                    break
-            return observation,  partial_rewards, done, None
+                    adversary_round_rewards[i]+=reward[i]
+            return observation,  adversary_round_rewards, done, None
+
         def step(self, action):
-            observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
-            formatted_action=self.format_action(action)
-            logger.debug(f'Action played by agent({"x" if self.agent_player_num==0 else "0"}): {formatted_action}')
-            logger.debug(f'Round rewards: {reward}')
-            logger.debug(f'Done: {done}')
+            observation, agent_round_rewards, done, _ = super(SelfPlayEnvBlobwar, self).step(action)
+            formatted_agent_action=super(SelfPlayEnvBlobwar, self).decode_action(action)
+            logger.debug(f'Action played by agent({"x" if self.agent_player_num==0 else "0"}): {formatted_agent_action}')
             if not done:
                 package = self.continue_game()
                 if package[0] is not None:
-                    observation, reward, done, _ = package
-            agent_reward = reward[self.agent_player_num]
+                    observation, adversary_round_rewards, done, _ = package
+                total_rewards=[r_agent+r_adversary for (r_agent,r_adversary) in zip(agent_round_rewards,adversary_round_rewards)]
+                logger.debug(f'Agent round Rewards: {agent_round_rewards}')
+                logger.debug(f'Adversary round rewards: {adversary_round_rewards}')
+                logger.debug(f'Total_round_reward: {total_rewards}')
+                logger.debug(f'Done: {done}')
+            else:
+                total_rewards=agent_round_rewards
+                logger.debug(f'Done: {done}')
+                logger.debug(f'Total_round_reward: {total_rewards}')
+            agent_reward = total_rewards[self.agent_player_num]
             logger.debug(f'Reward To Agent: {agent_reward}')
             self.render()
             return observation, agent_reward, done, {}
 
-    if env.name=="blobwar":
-        return SelfPlayEnvBlobwar
 
-    return SelfPlayEnv
+
+    return SelfPlayEnvBlobwar
