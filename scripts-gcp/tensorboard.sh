@@ -1,1 +1,1 @@
-tensorboard --logdir ../logs
+tensorboard --logdir ../app/logs --port 6006

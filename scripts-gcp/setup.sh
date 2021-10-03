@@ -16,3 +16,4 @@ apt-get -y install cmake libopenmpi-dev python3-dev zlib1g-dev libgl1-mesa-dev
 pip3 install --upgrade pip
 pip3 install --upgrade setuptools
 pip3 install -r ../app/requirements.txt
+pip3 install tensorboard
