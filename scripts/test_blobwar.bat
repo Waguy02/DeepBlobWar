@@ -1,1 +1,2 @@
-docker-compose exec app python3 test.py -d -g 100 -a greedy best_model  -e blobwar
+%%conda activate tf
+python ../app/test.py -d -g 1 -a best_model greedy  -e blobwar --best
