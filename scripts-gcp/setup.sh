@@ -1,5 +1,5 @@
-#conda create --name tf1 python=3.7
-#conda activate tf1
+conda create --name tf1 python=3.8
+conda activate tf1
 #conda install -c conda-forge tensorflow-gpu=1.15
 #conda install -c conda-forge tensorboardx -y
 #conda install -c conda-forge notebook -y
