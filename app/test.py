@@ -160,7 +160,7 @@ def cli() -> None:
   parser.add_argument("--agents","-a", nargs = '+', type=str, default = ['human', 'human']
                 , help="Player Agents (human, ppo version)")
   parser.add_argument("--best", "-b", action = 'store_true', default = False
-                , help="Make AI agents choose the best move (rather than sampling)")
+                , help="Make AI agents choose the S move (rather than sampling)")
   parser.add_argument("--games", "-g", type = int, default = 1
                 , help="Number of games to play)")
   # parser.add_argument("--n_players", "-n", type = int, default = 3
