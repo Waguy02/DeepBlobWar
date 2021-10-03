@@ -4,7 +4,7 @@ import random
 
 from utils.files import load_model, load_all_models, get_best_model_name
 from utils.agents import Agent
-
+from environments.blobwar.constants import SIZE
 import config
 
 from stable_baselines import logger
@@ -93,6 +93,8 @@ def selfplay_wrapper(env):
         def step(self, action):
             self.render()
             observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
+
+            formatted_action=action if self.action_formatter is None else "f"
             logger.debug(f'Action played by agent: {action}')
             logger.debug(f'Rewards: {reward}')
             logger.debug(f'Done: {done}')
@@ -109,6 +111,64 @@ def selfplay_wrapper(env):
             if done:
                 self.render()
 
-            return observation, agent_reward, done, {} 
+            return observation, agent_reward, done, {}
+
+
+    class SelfPlayEnvBlobwar(SelfPlayEnv):
+        """:
+        Special SelfPlay For blobwar game. Some modifications. overriding of continue game and step methods to handle partial rewards.
+        """
+        # wrapper over the normal single player env, but loads the best self play model
+        def __init__(self, opponent_type, verbose):
+            super(SelfPlayEnv, self).__init__(opponent_type,verbose)
+
+
+        def format_action(self, action):
+            xsize = SIZE
+            ysize = SIZE
+            x1 = int(action / ((xsize) * (ysize ** 2)))
+            action = action - ((xsize) * (ysize ** 2)) * x1
+            y1 = int(action / (xsize * (ysize)))
+            action = action - ((xsize) * (ysize)) * y1
+
+            x2 = int(action / (xsize))
+            action - ((xsize)) * x2
+            y2 = action % xsize
+            return str([(x1, y1), (x2, y2)])
+
+        def continue_game(self):
+            observation = None
+            done = None
+
+            """Working with partial rewards and at the end of the round, sum up reward amount step"""
+            partial_rewards=[0 for _ in range(len(self.agents))]
+            while self.current_player_num != self.agent_player_num:
+                self.render()
+                action = self.current_agent.choose_action(self, choose_best_action = False, mask_invalid_actions = False)
+                observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
+                for i in range(len(self.agents)):
+                    partial_rewards[i]+=reward[i]
+                logger.debug(f'Rewards: {reward}')
+                logger.debug(f'Done: {done}')
+                if done:
+                    break
+            return observation,  partial_rewards, done, None
+        def step(self, action):
+            observation, reward, done, _ = super(SelfPlayEnv, self).step(action)
+            formatted_action=self.format_action(action)
+            logger.debug(f'Action played by agent({"x" if self.agent_player_num==0 else "0"}): {formatted_action}')
+            logger.debug(f'Round rewards: {reward}')
+            logger.debug(f'Done: {done}')
+            if not done:
+                package = self.continue_game()
+                if package[0] is not None:
+                    observation, reward, done, _ = package
+            agent_reward = reward[self.agent_player_num]
+            logger.debug(f'Reward To Agent: {agent_reward}')
+            self.render()
+            return observation, agent_reward, done, {}
+
+    if env.name=="blobwar":
+        return SelfPlayEnvBlobwar
 
     return SelfPlayEnv

@@ -30,31 +30,22 @@ class Agent():
       self.model = model
       self.points = 0
 
-  def format_action(self, action):
-      xsize = SIZE
-      ysize = SIZE
-      x1 = int(action / ((xsize) * (ysize ** 2)))
-      action = action - ((xsize) * (ysize ** 2)) * x1
-
-      y1 = int(action / (xsize * (ysize)))
-      action = action - ((xsize) * (ysize)) * y1
-
-      x2 = int(action / (xsize))
-      action - ((xsize)) * x2
-      y2 = action % xsize
-      return str(action )+":"+str([(x1, y1), (x2, y2)])
 
 
-  def print_top_actions(self, action_probs):
+  def print_top_actions(self, action_probs,env=None):
     top5_action_idx = np.argsort(-action_probs)[:5]
     top5_actions = action_probs[top5_action_idx]
-    formatter =self.format_action
+
+    if env is not None and env.name=="blobwar":
+        formatter =env.decode_action
+    else :
+        formatter=lambda  action:action
+
     logger.debug(f"Top 5 actions: {[str(formatter(i)) + ': ' + str(round(a, 5)) for i, a in zip(top5_action_idx, top5_actions)]}")
 
   def choose_action(self, env, choose_best_action, mask_invalid_actions):
       if self.name=="greedy":
         return self.greedy(env, choose_best_action, mask_invalid_actions)
-
 
       if self.name == 'rules':
         action_probs = np.array(env.rules_move())
@@ -65,12 +56,12 @@ class Agent():
         logger.debug(f'Value {value:.2f}')
 
       # logger.debug(f'\n action probs:{action_probs} ')
-      self.print_top_actions(action_probs)
+      self.print_top_actions(action_probs,env=env)
 
       if mask_invalid_actions:
         action_probs = mask_actions(env.legal_actions, action_probs)
         logger.debug('Masked ->')
-        self.print_top_actions(action_probs)
+        self.print_top_actions(action_probs,env=env)
         
       action = np.argmax(action_probs)
 
