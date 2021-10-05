@@ -100,7 +100,7 @@ In the `/app/zoo/blobwar` folder, `best_model.zip` is output each time the perfo
 
 
 ##GUI
-
+___
 We implemented a GUI using [game2board](https://github.com/mjbrusso/game2dboard]) to provide a nice and intuitive experience of the game; 
 The game can be launched with differents various board size (from 5 to 10).
 
