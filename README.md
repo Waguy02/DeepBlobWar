@@ -1,209 +1,176 @@
 ## Getting Started
 
-In this project, we propose an implementation of the board game called BlobWar.  We have realized an Artificial Intelligence based on reinforcement learning to improve the performance of the computer in this game.
-
-
-The board contains blue and red pieces (also called blobs). Each player takes a turn. On each turn the current player chooses one of his pieces and moves it. Any piece may move to an adjacent empty square, including diagonally, duplicating itself and creating a new piece of the same color. A piece can also move two squares, i.e. max(∆row,∆column) = 2. In this case, there is no duplication and the pawn is said to make a "jump". Once arrived on its destination a pawn transforms all the neighboring pawns of its opponent into pawns of its own color. The game stops as soon as a player cannot play. The player with the most pieces on the board wins the game.
-
-As an example, the two pictures below illustrate a jump from the blue checker in square 32 to the square 
-
-### Prerequisites
-
+In this project, we propose an implementation of the board game called [BlobWar](https://bpi-etu.pages.ensimag.fr/2-iterations/travaux-pratiques/travaux-pratiques/11-blobwars/index.html)
+ proposed in the advanced algorithm course of [Grenoble-INP ENSIMAG Course](https://ensimag.grenoble-inp.fr/).  We have realized an Artificial Intelligence agent based on reinforcement learning to improve the performance of the computer in this game.
+The board contains blue andorange pieces (also called blobs). Each player takes a turn. On each turn the current player chooses one of his pieces and moves it. Any piece may move to an adjacent empty square, including diagonally, duplicating itself and creating a new piece of the same color. A piece can also move two squares, i.e. max(dx,dy) = 2. In this case, there is no duplication and the pawn is said to make a "jump". Once arrived on its destination a pawn transforms all the neighboring pawns of its opponent into pawns of its own color. The game stops when both players cannot play or when the board is only occupied by one player. The player with the most pieces on the board wins the game.
+As an example, the two pictures below illustrate a jump or the blue player from square (3,4) to square (5,4)
+---
+![Before jump](images/before_jump.png)
+![After jump](images/after_jump.png)
+---
+## Prerequisites
 Install [Docker](https://github.com/davidADSP/SIMPLE/issues) and [Docker Compose](https://docs.docker.com/compose/install/) to make use of the `docker-compose.yml` file
 
-### Installation
+## Installation
+Depending on your operating system you will run .bat or .sh files in the following steps
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/davidADSP/SIMPLE.git
-   cd SIMPLE
-   ```
-2. Build the image and 'up' the container.
-   ```sh
-   docker-compose up -d
-   ```
-
-   ```
-
----
-<!-- TUTORIAL -->
-## Tutorial
-
-This is a quick tutorial to allow you to start using the two entrypoints into the codebase: `test.py` and `train.py`.
-
-*TODO - I'll be adding more substantial documentation for both of these entrypoints in due course! For now, descriptions of each command line argument can be found at the bottom of the files themselves.*
-
----
-<!-- QUICKSTART -->
-### Quickstart
-
-#### `test.py` 
-
-This entrypoint allows you to play against a trained AI, pit two AIs against eachother or play against a baseline random model.
-
-For example, try the following command to play against a baseline random model in the Sushi Go environment.
-   ```sh
-   docker-compose exec app python3 test.py -d -g 1 -a base base human -e sushigo 
-   ```
-
-#### `train.py` 
-
-This entrypoint allows you to start training the AI using selfplay PPO. The underlying PPO engine is from the [Stable Baselines](https://stable-baselines.readthedocs.io/en/master/) package.
-
-For example, you can start training the agent to learn how to play SushiGo with the following command:
-   ```sh
-   docker-compose exec app python3 train.py -r -e sushigo 
-   ```
-
-After 30 or 40 iterations the process should have achieved above the default threshold score of 0.2 and will output a new `best_model.zip` to the `/zoo/sushigo` folder. 
-
-Training runs until you kill the process manually (e.g. with Ctrl-C), so do that now.
-
-You can now use the `test.py` entrypoint to play 100 games silently between the current `best_model.zip` and the random baselines model as follows:
-
-  ```sh
-  docker-compose exec app python3 test.py -g 100 -a best_model base base -e sushigo 
-  ```
-
-You should see that the best_model scores better than the two baseline model opponents. 
+1 Clone the repo
 ```sh
-Played 100 games: {'best_model_btkce': 31.0, 'base_sajsi': -15.5, 'base_poqaj': -15.5}
+git clone https://github.com/Waguy02/DeepBlobWar.git
+cd DeepBlobWar
 ```
+2 Build the image and 'up' the container
 
-You can continue training the agent by dropping the `-r` reset flag from the `train.py` entrypoint arguments - it will just pick up from where it left off.
-
-   ```sh
-   docker-compose exec app python3 train.py -e sushigo 
+Linux
+   ``` sh 
+   scripts/launch.sh  
+   ```
+Windows 
+   ``` bat 
+   scripts/launch.bat  
    ```
 
-Congratulations, you've just completed one training cycle for the game Sushi Go! The PPO agent will now have to work out a way to beat the model it has just created...
 
----
+ 
+
+
+##Model
+We made an implemented of our game model using the library **SIMPLE** of [https://github.com/davidADSP/SIMPLE](https://github.com/davidADSP/SIMPLE).
+The model is based on [Proximal Policy Optimization(PPO)](https://openai.com/blog/openai-baselines-ppo/) algorithm from OpenAI which is the state of art in Reinforcement Learning Tasks especially in games.
+
+The architecture of SIMPLE is the following
+![SIMPLE](images/diagram.png).
+Look at  **[SIMPLE TUTORIAL](https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717)** for more details on the 
+implementation of SIMPLE
+
+
+
+Our implementation has three many components:
+* The game core : **`/app/environments/blobwar/core`**. In this package we completely define the game logic (Board, state management, action valuations,...)
+* The BlobwarEnv:   **`/app/environments/blobwar/blobwar/envs`** . Here we realize a mapping between the game core and SIMPLE's Environment structure(based on OpenAI gym ).
+* The Neural Model: **`/app/models/blobwar`**. Here we define the layers of the neural models components: (Policy Network, Value Network..). We used some convolutions 
+layers to make the model learning relevant patterns in board configuration. 
+
+
+
+
+##Training 
+___
+### Set the board size:
+Go in the file `app/environments/blobwar/board_size` and set the value of __DEFAULT_SIZE . (from 5 to 10)
+
+
+### Define the model layers:
+Try to customize the model in the model architecture (Add or remove some layers). Pay attention on shapes and don't build a too deep model. Unless you have 100,000 CPUS.ahah
+
+
+
+### Launch Training
+Linux
+  ```sh
+   scripts/train_blobwar.sh
+  ```
+   Windows
+  ```bash
+     scripts/train_blobwar.bat
+  ```
+**Note**: The current script is configured to run the training in parallel way using 4 parallels processes. If you have more (respectfully less) cpus.
+Just increase (respectfully descrease) this value. In the `scripts/train_blobwar.sh` or `scripts/train_blobwar.sh`.
+___
+
+
+
 <!-- TENSORBOARD -->
 ### Tensorboard
 
 To monitor training, you can start Tensorboard with the following command:
-
+  Linux
   ```sh
-  bash scripts/tensorboard.sh
+   scripts/tensorboard.sh
   ```
-
-Navigate to `localhost:6006` in a browser to view the output.
-
-In the `/zoo/pretrained/` folder there is a pre-trained `/<game>/best_model.zip` for each game, that can be copied up a directory (e.g. to `/zoo/sushigo/best_model.zip`) if you want to test playing against a pre-trained agent right away.
-
----
-<!-- CUSTOM ENVIRONMENTS -->
-### Custom Environments
-
-You can add a new environment by copying and editing an existing environment in the `/environments/` folder.
-
-For the environment to work with the SIMPLE self-play wrapper, the class must contain the following methods (expanding on the standard methods from the OpenAI Gym framework):
-
-`__init__`
-
-In the initiation method, you need to define the usual `action_space` and `observation_space`, as well as two additional variables: 
-  * `n_players` - the number of players in the game
-  * `current_player_num` - an integer that tracks which player is currently active
-   
-
-`step`
-
-The `step` method accepts an `action` from the current active player and performs the necessary steps to update the game environment. It should also it should update the `current_player_num` to the next player, and check to see if an end state of the game has been reached.
+   Windows
+  ```bash
+     scripts/tensorboard.bat
+  ```
+Navigate to `localhost:6006` in a browser to view the output. You could see the learning curves described in **[SIMPLE TUTORIAL](https://medium.com/applied-data-science/how-to-train-ai-agents-to-play-multiplayer-games-using-self-play-deep-reinforcement-learning-247d0b440717)**
+![Tensorboard][images/tensorboard]
+For a board 6*6,the model start having intersting performance (beats Greedy model) after 200 iterations. I am currently running training and i will regurlaly update model 
+performance. Also ,I am still working on the benckmarking part of the project.
+In the `/app/zoo/blobwar` folder, `best_model.zip` is output each time the performance threshold is reached. Rename according to the size of board. (e.g if the size is 8*8, just rename it a `best_model.zip`) 
 
 
-`reset`
+##GUI
+We implemented a GUI using [game2board](https://github.com/mjbrusso/game2dboard]) to provide a nice and intuitive experience of the game; 
+The game can be launched with differents various board size (from 5 to 10).
 
-The `reset` method is called to reset the game to the starting state, ready to accept the first action.
+It is possible to play in the following configurations:
+* Human vs AI
+* Human vs Human
+* AI vs AI
 
-
-`render`
-
-The `render` function is called to output a visual or human readable summary of the current game state to the log file.
-
-
-`observation`
-
-The `observation` function returns a numpy array that can be fed as input to the PPO policy network. It should return a numeric representation of the current game state, from the perspective of the current player, where each element of the array is in the range `[-1,1]`.
-
-
-`legal_actions`
-
-The `legal_actions` function returns a numpy vector of the same length as the action space, where 1 indicates that the action is valid and 0 indicates that the action is invalid.
-
-
-Please refer to existing environments for examples of how to implement each method.
-
-You will also need to add the environment to the two functions in `/utils/register.py` - follow the existing examples of environments for the structure.
-
----
-<!-- Parallelisation -->
-### Parallelisation
-
-The training process can be parallelised using MPI across multiple cores.
-
-For example to run 10 parallel threads that contribute games to the current iteration, you can simply run:
-
+![Before jump](images/gui.png)
+    
+  It is possible to specify size of the board. The default size is specified by the variable "__DEFAULT_SIZE__" in file 
+  **app/environments/blobward/board_size.py**
+  
+  For example, to launch a 8*8 board :  
+  Linux
   ```sh
-  docker-compose exec app mpirun -np 10 python3 train.py -e sushigo 
-  ```
+   scripts/run_gui.sh 8
+  ```       
+  Windows
+  ```Bash
+   scripts/run_gui.bat  8
+  ```   
+   Try to play some parties with against your friends or the AI. Have a fun!!
 
----
-<!-- ROADMAP -->
-## Roadmap
+**Note**. The trained models should be the stored in the directory ** app/zoo/blobwar ** in the following format ** best_model[SIZE].zip **
+(For example best_model6.zip and best_model8.zip for board 6*6 and 8*8 respectfully)
+![model_store](images/model_store)
+For a given size, if the model is not yet trained (ie best_model[SIZE].zip not exists), the AI player will use a greedy strategy which always try to 
+maximize its next move (not very smart.)
 
-See the [open issues](https://github.com/davidADSP/SIMPLE/issues) for a list of proposed features (and known issues).
 
 
----
+
+
 <!-- CONTRIBUTING -->
 ## Contributing
-
-Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Any contributions you make are **greatly appreciated**. Especially for the following task.
+1. Implement classical algorithms like AlphaBeta, NegaMax, ...
+2. Perform the benchmark of the best_model performance according those algorithms 
 
 
----
-<!-- LICENSE -->
-## License
+So: 
+* Fork the Project
+* Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+* Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+* Push to the Branch (`git push origin feature/AmazingFeature`)
+* Open a Pull Request
 
-Distributed under the GPL-3.0. See `LICENSE` for more information.
 
 
 ---
 <!-- CONTACT -->
 ## Contact
+Guy Waffo - [@GDzuyo] -guywaffo@gmail.com
 
-David Foster - [@davidADSP](https://twitter.com/davidADSP) - david@adsp.ai
 
-Project Link: [https://github.com/davidADSP/SIMPLE](https://github.com/davidADSP/SIMPLE)
+Project Link: [https://github.com/Waguy02/DeepBlobWar](https://github.com/Waguy02/DeepBlobWar)
 
 
 ---
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
+Thanks to David Foster [@davidADSP](https://twitter.com/davidADSP) who built this amazing framework and a quiet nice documentation. 
+My main motivation was to apply recent reinforcement learning techniques to a new game so I considered popular games such as chess to
+be unrelevant .
 
-There are many repositories and blogs that have helped me to put together this repository. One that deserves particular acknowledgement is David's Ha's Slime Volleyball Gym, that also implements multi-agent reinforcement learning. It has helped to me understand how to adapt the callback function to a self-play setting and also to how to implement MPI so that the codebase can be highly parallelised. Definitely worth checking out! 
 
-* [David Ha - Slime Volleyball Gym](https://github.com/hardmaru/slimevolleygym)
 
----
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/davidADSP/SIMPLE.svg?style=for-the-badge
-[contributors-url]: https://github.com/davidADSP/SIMPLE/graphs/contributors
+[contributors-url]: https://github.com/Waguy02/DeepBlobWar/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/davidADSP/SIMPLE.svg?style=for-the-badge
-[forks-url]: https://github.com/davidADSP/SIMPLE/network/members
-[stars-shield]: https://img.shields.io/github/stars/davidADSP/SIMPLE.svg?style=for-the-badge
-[stars-url]: https://github.com/davidADSP/SIMPLE/stargazers
-[issues-shield]: https://img.shields.io/github/issues/davidADSP/SIMPLE.svg?style=for-the-badge
-[issues-url]: https://github.com/davidADSP/SIMPLE/issues
-[license-shield]: https://img.shields.io/github/license/davidADSP/SIMPLE.svg?style=for-the-badge
-[license-url]: https://github.com/davidADSP/SIMPLE/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/davidtfoster
+[forks-url]: https://github.com/Waguy02/DeepBlobWar/network/members
+[linkedin-url]: https://www.linkedin.com/in/guy-stephane-waffo-159030192/

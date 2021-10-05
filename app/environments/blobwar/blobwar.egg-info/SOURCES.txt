@@ -1,0 +1,16 @@
+setup.py
+blobwar/__init__.py
+blobwar.egg-info/PKG-INFO
+blobwar.egg-info/SOURCES.txt
+blobwar.egg-info/dependency_links.txt
+blobwar.egg-info/requires.txt
+blobwar.egg-info/top_level.txt
+blobwar/envs/__init__.py
+blobwar/envs/blobwar.py
+core/__init__.py
+core/board.py
+core/configuration.py
+core/strategies/__init__.py
+core/strategies/greedy.py
+core/strategies/human.py
+core/strategies/strategy.py
