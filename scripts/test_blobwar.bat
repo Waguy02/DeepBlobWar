@@ -1,1 +1,1 @@
-docker-compose exec app python3 test.py -d -g 100 -a greedy best_model  -e blobwar
+docker-compose exec app python3 test.py -d -g 1 -a best_model human -e blobwar --best

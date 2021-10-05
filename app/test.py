@@ -181,7 +181,7 @@ def cli() -> None:
             , help="Which game to play?")
   parser.add_argument("--write_results", "-w",  action = 'store_true', default = False
             , help="Write results to a file?")
-  parser.add_argument("--seed", "-s",  type = int, default = 17
+  parser.add_argument("--seed", "-s",  type = int, default = 10
             , help="Random seed")
 
   # Extract args
