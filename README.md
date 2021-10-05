@@ -1,5 +1,5 @@
 ## Getting Started
-
+___
 In this project, we propose an implementation of the board game called [BlobWar](https://bpi-etu.pages.ensimag.fr/2-iterations/travaux-pratiques/travaux-pratiques/11-blobwars/index.html)
  proposed in the advanced algorithm course of [Grenoble-INP ENSIMAG Course](https://ensimag.grenoble-inp.fr/).  We have realized an Artificial Intelligence agent based on reinforcement learning to improve the performance of the computer in this game.
 The board contains blue andorange pieces (also called blobs). Each player takes a turn. On each turn the current player chooses one of his pieces and moves it. Any piece may move to an adjacent empty square, including diagonally, duplicating itself and creating a new piece of the same color. A piece can also move two squares, i.e. max(dx,dy) = 2. In this case, there is no duplication and the pawn is said to make a "jump". Once arrived on its destination a pawn transforms all the neighboring pawns of its opponent into pawns of its own color. The game stops when both players cannot play or when the board is only occupied by one player. The player with the most pieces on the board wins the game.
