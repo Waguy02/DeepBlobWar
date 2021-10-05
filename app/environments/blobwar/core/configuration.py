@@ -15,6 +15,10 @@ class Configuration:
         self.player1_name=""
         self.player2_name= ""
 
+    def reset(self):
+        self.board.initialize_positions()
+        self.current_player=1
+
 
     def battle(self,player1:Strategy,player2:Strategy):
         self.player1_name=player1.name()
@@ -172,17 +176,19 @@ class Configuration:
                             bad_moves.append(mvt)
         return bad_moves
 
+    def check_in_board(self,x, y):
+        return x >= 0 and x < self.board.shape[0] and y >= 0 and y < self.board.shape[1]
+
     def check_move(self,mvt:[])->bool:
         if mvt==None: ##Can perform empty move
             return True
-        def check_in_board(x,y):
-            return x>=0 and x<self.board.shape[0] and y>=0 and y<self.board.shape[1]
+
 
 
         x_source, y_source = mvt[0]
         x_dest, y_dest = mvt[1]
 
-        if not check_in_board(x_source,y_source) or not check_in_board(x_dest,y_dest):
+        if not self.check_in_board(x_source,y_source) or not self.check_in_board(x_dest,y_dest):
             return False
 
         if self.distance(mvt)!=1 and self.distance(mvt)!=2:
@@ -192,7 +198,7 @@ class Configuration:
         if self.board.positions[x_source][y_source]!=self.current_player:
             return False
 
-        if not self.__is_free__(x_dest,y_dest):
+        if not self.is_free(x_dest, y_dest):
             return False
 
         return True
@@ -270,7 +276,7 @@ class Configuration:
         return 0
 
 
-    def __is_free__(self, ix, iy)->bool:
+    def is_free(self, ix, iy)->bool:
         return self.board.positions[ix][iy]==0
 
     def __is_adverse__(self, ix, iy)->bool:
@@ -295,7 +301,7 @@ class Configuration:
             for dy in [-distance,0,distance]:
                 if ix+dx<0 or ix+dx>=ix_max or iy+dy<0 or iy+dy>=iy_max:
                     continue
-                if self.__is_free__(ix + dx, iy + dy):
+                if self.is_free(ix + dx, iy + dy):
                     neighbours.append((ix+dx,iy+dy))
 
         return neighbours

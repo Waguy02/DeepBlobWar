@@ -1,2 +1,1 @@
-%%conda activate tf
-python ../app/test.py -d -g 1 -a best_model greedy  -e blobwar --best
+docker-compose exec app python3 test.py -d -g 1 -a best_model human -e blobwar --best
