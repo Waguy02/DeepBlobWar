@@ -99,8 +99,9 @@ performance. Also ,I am still working on the benckmarking part of the project.
 In the `/app/zoo/blobwar` folder, `best_model.zip` is output each time the performance threshold is reached. Rename according to the size of board. (e.g if the size is 8*8, just rename it a `best_model.zip`) 
 
 
-##GUI
-___
+## GUI
+
+
 We implemented a GUI using [game2board](https://github.com/mjbrusso/game2dboard]) to provide a nice and intuitive experience of the game; 
 The game can be launched with differents various board size (from 5 to 10).
 
