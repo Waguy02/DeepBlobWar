@@ -50,11 +50,6 @@ class Agent():
     logger.debug(f"Top 5 actions: {[str(formatter(i)) + ': ' + str(round(a, 5)) for i, a in zip(top5_action_idx, top5_actions)]}")
 
   def choose_action(self, env, choose_best_action, mask_invalid_actions):
-
-
-
-
-
       if self.name=="greedy":
         return self.greedy(env, choose_best_action, mask_invalid_actions)
 
