@@ -143,6 +143,8 @@ class BlobwarGui:
             return
 
     def __on_first_click(self,btn, x, y):
+        if self.env.core.board[x][y]==0:
+            return
         current_player=self.__player_num__(self.env.core.current_player)
         if self.__player_num__(self.env.core.board[x][y]) !=current_player:
             return
