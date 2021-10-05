@@ -1,1 +1,0 @@
-docker-compose exec app python3 train.py -r -e sushigo

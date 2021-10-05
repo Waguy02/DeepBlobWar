@@ -144,7 +144,7 @@ class Configuration:
             for iy in range(iy_max):
                 if self.board.positions[ix][iy] != self.current_player:
                     continue
-                for neighbour in self.__neighbours__(ix, iy, distance=2):
+                for neighbour in self.neighbours(ix, iy, distance_x=2,distance_y=2):
                     jumps.append([(ix,iy),neighbour])
         return jumps
 
@@ -157,7 +157,7 @@ class Configuration:
             for iy in range(iy_max):
                 if self.board.positions[ix][iy] != self.current_player:
                     continue
-                for neighbour in self.__neighbours__(ix, iy,distance=1):
+                for neighbour in self.neighbours(ix, iy, distance_x=1,distance_y=1):
                     duplics.append([(ix, iy), neighbour])
         return duplics
 
@@ -282,7 +282,7 @@ class Configuration:
     def __is_adverse__(self, ix, iy)->bool:
         return self.board.positions[ix][iy]==-1*self.current_player
 
-    def __neighbours__(self, ix, iy, distance=None)->[]:
+    def neighbours(self, ix, iy, distance_x=None, distance_y=None)->[]:
         """
         :param ix:
         :type ix:
@@ -294,17 +294,21 @@ class Configuration:
         ix_max, iy_max = self.board.shape[0], self.board.shape[1]
         neighbours=[]
 
-        if distance==None:
-            return self.__neighbours__(ix, iy, distance=1) + self.__neighbours__(ix, ix, distance=2) #Combine all neighbours
+        if distance_x==None:
+            return self.neighbours(ix, iy, distance_x=1, distance_y=distance_y) + self.neighbours(ix, iy, distance_x=2, distance_y=distance_y) #Combine all neighbours
+
+        if distance_y==None:
+            return self.neighbours(ix, iy, distance_x=distance_x, distance_y=1) + self.neighbours(ix, iy, distance_x=distance_x, distance_y=2)
+
         
-        for dx in [-distance,0, distance]:
-            for dy in [-distance,0,distance]:
+        for dx in [-distance_x, 0, distance_x]:
+            for dy in [-distance_y, 0, distance_y]:
                 if ix+dx<0 or ix+dx>=ix_max or iy+dy<0 or iy+dy>=iy_max:
                     continue
                 if self.is_free(ix + dx, iy + dy):
-                    neighbours.append((ix+dx,iy+dy))
+                    neighbours.append((ix + dx, iy + dy))
 
-        return neighbours
+        return list(set(neighbours))
     
     
     def __adverse_neighbours__(self, ix, iy)->[]:

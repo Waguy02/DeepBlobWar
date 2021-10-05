@@ -1,6 +1,6 @@
-from app.environments.blobwar.core.strategies.greedy import Greedy
+from environments.blobwar.core.strategies.greedy import Greedy
 
-from app.gui.blobwar.players.player import Player
+from gui.blobwar.players.player import Player
 
 
 class GreedyPlayer(Player):

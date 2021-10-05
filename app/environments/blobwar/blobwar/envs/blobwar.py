@@ -3,11 +3,8 @@
 import gym
 import numpy as np
 from environments.blobwar.core.board import Board
-from environments.blobwar.constants import SIZE
+from environments.blobwar.board_size import get_size
 from environments.blobwar.core.configuration import Configuration
-
-
-
 
 from stable_baselines import logger
 class Player():
@@ -24,7 +21,9 @@ class BlobWarEnv(gym.Env):
         super(BlobWarEnv, self).__init__()
         self.name = 'blobwar'
         self.manual = manual
-        self.core=Configuration(Board(xsize=SIZE,ysize=SIZE))
+
+        size=get_size()
+        self.core=Configuration(Board(xsize=size,ysize=size))
         self.n_players=2
         self.current_player_num=0
         self.xsize=self.core.board.shape[0]

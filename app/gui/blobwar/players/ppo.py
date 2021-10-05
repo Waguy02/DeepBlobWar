@@ -1,4 +1,4 @@
-from app.gui.blobwar.players.player import Player
+from gui.blobwar.players.player import Player
 from utils.files import load_model, write_results
 from utils.agents import Agent
 

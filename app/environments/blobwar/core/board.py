@@ -1,10 +1,14 @@
 
-
 import numpy as np
+from environments.blobwar.board_size import get_size
 
-from environments.blobwar.constants import SIZE
 class Board:
-    def __init__(self,xsize=SIZE,ysize=SIZE,initial_positions:[]=-1):
+    def __init__(self,xsize=None,ysize=None,initial_positions:[]=-1):
+
+
+        if xsize is None or ysize is None:
+            xsize=ysize=get_size()
+
         self.shape=(xsize,ysize)
         self.initial_positions=initial_positions
         self.initialize_positions()

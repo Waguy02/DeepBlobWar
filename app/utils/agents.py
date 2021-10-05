@@ -2,13 +2,12 @@ import sys
 import numpy as np
 from environments.blobwar.core.strategies.greedy import Greedy
 
-from environments.blobwar.constants import SIZE
+
 
 np.set_printoptions(threshold=sys.maxsize)
 import random
 import string
 
-import config
 
 from stable_baselines import logger
 
@@ -71,13 +70,13 @@ class Agent():
         
       action = np.argmax(action_probs)
 
-      formatter = env.decode_action  if env is not None and env.name=="blobward" else lambda action:action
+      formatter = env.decode_action  if env is not None and env.name=="blobwar" else lambda action:action
 
       logger.debug(f'Best action {formatter(action)}')
 
       if not    choose_best_action:
           action = sample_action(action_probs)
-          logger.debug(f'Sampled action {formatter(action)} chosen')
+          logger.debug(f'Sampled action : {formatter(action)} chosen')
 
       return action
 
@@ -90,7 +89,7 @@ class Agent():
           return max_action
 
       else:
-          raise Exception("Greedy Strategy not implemented for  "+env.name)
+          raise Exception("Greedy Strategy not implemented for game  "+env.name)
 
 
 

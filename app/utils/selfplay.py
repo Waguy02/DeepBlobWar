@@ -4,7 +4,7 @@ import random
 
 from utils.files import load_model, load_all_models, get_best_model_name
 from utils.agents import Agent
-from environments.blobwar.constants import SIZE
+
 
 import config
 
@@ -176,20 +176,6 @@ def selfplay_wrapper(env):
         @property
         def current_agent(self):
             return self.agents[self.current_player_num]
-
-
-        # def format_action(self, action):
-        #     xsize = SIZE
-        #     ysize = SIZE
-        #     x1 = int(action / ((xsize) * (ysize ** 2)))
-        #     action = action - ((xsize) * (ysize ** 2)) * x1
-        #     y1 = int(action / (xsize * (ysize)))
-        #     action = action - ((xsize) * (ysize)) * y1
-        #
-        #     x2 = int(action / (xsize))
-        #     action - ((xsize)) * x2
-        #     y2 = action % xsize
-        #     return str([(x1, y1), (x2, y2)])
 
         def continue_game(self):
             """Working with partial rewards and at the end of the round, sum up reward amount step"""

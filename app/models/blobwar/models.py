@@ -8,24 +8,25 @@ from tensorflow.keras.layers import BatchNormalization, Activation, Flatten, Con
 import tensorflow.keras.backend as K
 from stable_baselines.common.policies import ActorCriticPolicy
 from stable_baselines.common.distributions import CategoricalProbabilityDistribution
-
-from environments.blobwar.constants import SIZE
-
-
-XSIZE=SIZE
-YSIZE=SIZE
-ACTIONS = (XSIZE**2)*(YSIZE**2)
-
+from environments.blobwar.board_size import get_size
 
 
 class CustomPolicy(ActorCriticPolicy):
     def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **kwargs):
         super(CustomPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse, scale=True)
+
+        size=get_size()
+        self.size=size
+        self.xsize=size
+        self.ysize=size
+        self.actions=(self.xsize**2)*(self.xsize**2)
+
+
         with tf.variable_scope("model", reuse=reuse):
-            observations, legal_actions = split_input(self.processed_obs)
-            extracted_features = resnet_extractor(observations, **kwargs)
-            self._policy = policy_head(extracted_features,legal_actions)
-            self._value_fn, self.q_value = value_head(extracted_features)
+            observations, legal_actions = self.split_input(self.processed_obs)
+            extracted_features = resnet_extractor(observations,self.size, **kwargs)
+            self._policy = policy_head(extracted_features,legal_actions,self.size)
+            self._value_fn, self.q_value = value_head(extracted_features,self.size)
             self._proba_distribution = CategoricalProbabilityDistribution(self._policy)
 
 
@@ -46,28 +47,37 @@ class CustomPolicy(ActorCriticPolicy):
     def value(self, obs, state=None, mask=None):
         return self.sess.run(self.value_flat, {self.obs_ph: obs})
 
-def value_head(y):
-    y = convolutional(y, 3, SIZE-3,name="")
+    def split_input(self,obs):
+        ##Extract observation and legal actions from env obs (env obs = observation  + legal actions)
+        observations = obs[:, :self.xsize, :, :]
+        legal_actions = obs[:, self.xsize:, :, :]  ##The none action is always legal
+        return observations, legal_actions
+
+def value_head(y,size):
+    y = convolutional(y, 3, size-3,name="")
+    actions=size**4
     y = Flatten()(y)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')
-    q = dense(y, ACTIONS, batch_norm=False, activation='tanh', name='q')
+    q = dense(y, actions, batch_norm=False, activation='tanh', name='q')
     return vf, q
 
-def policy_head(y,legal_actions):
-    y = convolutional(y, 4, SIZE-1,name="POLICY_CONV")
+def policy_head(y,legal_actions,size):
+    y = convolutional(y, 4, size-1,name="POLICY_CONV")
+    actions = size ** 4
+
     y = Flatten()(y)
-    policy = dense(y, ACTIONS, batch_norm=False, name='pi')
+    policy = dense(y, actions, batch_norm=False, name='pi')
     mask=Flatten()(legal_actions)
     mask = Lambda(lambda x: (1 - x) * -1e8)(mask)
     policy = Add()([policy, mask])
 
     return policy
 
-def resnet_extractor(y, **kwargs):
-    y = convolutional(y, 32,SIZE-1,name="RESNET_CONV")
-    y = residual(y, 32,SIZE - 1)
-    y = residual(y, 32, SIZE - 1)
-    y = residual(y, 32, SIZE - 1)
+def resnet_extractor(y,size, **kwargs):
+    y = convolutional(y, 32,size-1,name="RESNET_CONV")
+    y = residual(y, 32,size - 1)
+    y = residual(y, 32, size - 1)
+    y = residual(y, 32, size - 1)
     return y
 
 def convolutional(y, filters, kernel_size,name=None):
@@ -119,8 +129,3 @@ def dense(y, filters, batch_norm=True, activation='relu', name=None):
         y = Activation(activation, name=name)(y)
     return y
 
-def split_input(obs):
-    ##Extract observation and legal actions from env obs (env obs = observation  + legal actions)
-    observations=obs[:,:XSIZE ,:,:]
-    legal_actions=obs[ :,XSIZE:,:,:] ##The none action is always legal
-    return   observations,legal_actions

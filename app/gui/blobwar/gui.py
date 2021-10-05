@@ -5,9 +5,11 @@ from enum import Enum
 
 from gym.envs import game
 
-from app.gui.blobwar.players.greedy import GreedyPlayer
-from app.gui.blobwar.players.human import Human
-from app.gui.blobwar.players.ppo import PPO
+from gui.blobwar.players.greedy import GreedyPlayer
+from gui.blobwar.players.human import Human
+from gui.blobwar.players.ppo import PPO
+
+from utils.register import get_environment
 
 
 class GameState(Enum):
@@ -24,32 +26,45 @@ PLAYER1_COLOR="blue"
 PLAYER2_COLOR="orange"
 
 class BlobwarGui:
-    def __init__(self,env):
+    def __init__(self):
         """:cvar"""
 
-
-
+        env = get_environment("blobwar")()
+        env.seed(10)
         self.images={1:"blob_blue",2:"blob_orange"}
         self.images_selected= {1: "blob_blue_selected", 2: "blob_orange_selected"}
+        self.images_candidates={1: "blob_blue_candidate", 2: "blob_orange_candidate"}
         self.env=env
         self.human_player=Human()
-        self.ai_player_1=PPO(self.env, size=self.env.core.board.shape[0])
-        self.ai_player_2=GreedyPlayer()
+
+
+        try :
+            self.ai_player_1=PPO(self.env, size=self.env.core.board.shape[0])
+        except Exception as e:
+            print("PPO not yet trained for : ",self.env.core.board.shape[0])
+            self.ai_player_1 = GreedyPlayer()
+
+        self.ai_player_2=self.ai_player_1
 
         self.player1=self.player2=0
 
 
         self.game=Board(self.env.core.board.shape[0],self.env.core.board.shape[1])
-        self.game.cell_size = 90
+
+        self.game.cell_size = 70
+
         self.game.cell_spacing = 1
         self.game.fill(None)
 
         self.game.margin_color = self.game.grid_color = "wheat4"
         self.game.cell_color = "white"
         self.game.title = "Blobwar"
-        self.game.create_output(color="blue",font_size=13)
+        self.game.create_output(font_size=11)
         self.state=GameState.GAME_OVER
+
         self.move_start_case=None
+        self.move_candidates_case=[]
+
 
 
 
@@ -76,7 +91,9 @@ class BlobwarGui:
             self.player2=self.ai_player_2
         self.env.core.reset()
         self.state=GameState.WAITING_FIRST_CLICK
+
         self.move_start_case=None
+        self.move_candidates_case=[]
         self.render()
 
 
@@ -103,7 +120,9 @@ class BlobwarGui:
                 self.game[x][y]=self.images[self.__player_num__(self.env.core.board[x][y])]
 
         if self.move_start_case is not None:
-            self.game[self.move_start_case[0]][self.move_start_case[1]]=self.images_selected[self.__player_num__(self.env.core.current_player)]
+            self.render_selected()
+
+
 
 
     def fnkbd(self,key):
@@ -150,15 +169,17 @@ class BlobwarGui:
             return
 
         else :
-            self.game[x][y]=self.images_selected[current_player]
             self.move_start_case=(x, y)
+            self.move_candidates_case=self.env.core.neighbours(x,y)
+            self.render()
             self.state=GameState.WAITING_SECOND_CLICK
 
     def __on_second_click(self,btn,x,y):
         current_player = self.__player_num__(self.env.core.current_player)
         if (x,y)==self.move_start_case:
-            self.game[x][y]=self.images[current_player]
             self.move_start_case = None
+            self.move_candidates_case=[]
+            self.render()
             self.state=GameState.WAITING_FIRST_CLICK
             return
         movement=[self.move_start_case, (x, y)]
@@ -169,47 +190,68 @@ class BlobwarGui:
             (x_start,y_start)=self.move_start_case
             self.game[x_start][y_start] = self.images[current_player]
             self.move_start_case=None
+            self.move_candidates_case=[]
             self.state = GameState.WAITING_FIRST_CLICK
             self.render()
 
             ###Automatic play
-            current_player = self.player1 if self.__player_num__(self.env.core.current_player) == 1 else self.player2
 
-            if self.env.core.game_over():
-                self.state = GameState.GAME_OVER
-                winner_id = self.env.core.leading_player()
-                winner = self.__player_num__(winner_id)
-                winner_player = self.player1 if winner == 1 else self.player2
-                self.render()
+            def after_move():
+                current_player = self.player1 if self.__player_num__(self.env.core.current_player) == 1 else self.player2
+
+                if self.env.core.game_over():
+                    self.state = GameState.GAME_OVER
+                    winner_id = self.env.core.leading_player()
+
+                    self.render()
+                    self.print_status()
+                    return
+
+
                 self.print_status()
-                return
+                if not isinstance(current_player ,Human):
+                    movement = current_player.choose_action(self.env)
+                    self.env.core.apply_movement(movement)
+                    self.print_status()
+                    self.pause(300)
+                else :
+                    if len(self.env.core.movements())==0:
+                        self.env.core.apply_movement(None)
+                        self.print_status()
 
-
-            self.print_status()
-            if not isinstance(current_player ,Human):
-                movement = current_player.choose_action(self.env)
-                self.env.core.apply_movement(movement)
-                self.print_status()
-                self.pause(300)
-
+            after_move()
             self.render()
 
         else :
             x_old,y_old=self.move_start_case
             self.game[x_old][y_old] = self.images[current_player]
+            self.move_candidates_case=[]
             if self.game[x][y]==self.images[current_player]:
                 self.move_start_case=x,y
-                self.game[x][y] = self.images_selected[current_player]
+                self.move_candidates_case=self.env.core.neighbours(x,y)
                 self.state=GameState.WAITING_SECOND_CLICK
             else:
                 self.move_start_case = None
+                self.move_candidates_case= []
                 self.state=GameState.WAITING_FIRST_CLICK
+            self.render()
+
             return
 
 
         if self.env.core.game_over():
             self.state=GameState.GAME_OVER
             self.print_status()
+
+    def render_selected(self):
+        if self.move_start_case is None:
+            return
+        current_player_num =self.__player_num__(self.env.core.current_player)
+        x,y=self.move_start_case
+        self.game[x][y] = self.images_selected[current_player_num]
+        for (x_cand,y_cand) in self.move_candidates_case:
+            self.game[x_cand][y_cand]=self.images_candidates[current_player_num]
+
 
 
     def autoplay(self):
@@ -223,7 +265,7 @@ class BlobwarGui:
             if self.env.core.game_over():
                 self.state=GameState.GAME_OVER
             self.print_status()
-            self.pause(100)
+            self.pause(50)
             self.render()
 
 
@@ -236,8 +278,8 @@ class BlobwarGui:
         player0_value=int(self.env.core.player_value(1))
         # scores=f" {self.player1.name}({PLAYER1_COLOR}) : {player0_value} ,  {self.player2.name}({PLAYER2_COLOR}) : {-1*player0_value}"
 
-        header=f"\t{self.player1.name}({PLAYER1_COLOR}): {player0_value}   VS  {self.player2.name}({PLAYER2_COLOR}): {-player0_value}\n\n  New Game(F2/F3/F4)\n\tF2:Human vs AI   F3:Human vs Human   F4:AI vs AI "
-
+        header=f"\t{self.player1.name}({PLAYER1_COLOR}): {player0_value}   VS  {self.player2.name}({PLAYER2_COLOR}): {-player0_value}"
+        restart_message="\n \tF2:Human vs AI   F3:Human vs Human   F4:AI vs AI "
         if self.env.core.game_over():
             winner_id = self.env.core.leading_player()
             winner = self.__player_num__(winner_id)
@@ -247,17 +289,18 @@ class BlobwarGui:
             if player0_value==0:
                 current_message=f"\tDraw"
             else:
-                current_message=f"\t{winner_player.name}({winner_color}) wins"
+                current_message=f"\t{winner_player.name}({winner_color}) won!!"
 
         else:
 
             current_message=f"\t{current_player.name}({current_player_color})  playing ..."
 
 
-        text=header+"\n"+current_message
+        text=header+"\n"+current_message+"\n"+restart_message
         self.game.print(text)
 
 
     def pause(self,millis):
+
         self.game.pause(millis)
-        # time.sleep(millis/1000.0)
+

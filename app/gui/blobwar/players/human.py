@@ -1,4 +1,4 @@
-from app.gui.blobwar.players.player import Player
+from gui.blobwar.players.player import Player
 
 class Human(Player):
     def __init__(self,name="Human"):
