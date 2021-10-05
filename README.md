@@ -136,7 +136,7 @@ maximize its next move (not very smart.)
 
 <!-- CONTRIBUTING -->
 ## Contributing
-Any contributions you make are **greatly appreciated**. Especially for the following task.
+Any contributions you make are **greatly appreciated**. Especially for the following tasks.
 1. Implement classical algorithms like AlphaBeta, NegaMax, ...
 2. Perform the benchmark of the best_model performance according those algorithms 
 
