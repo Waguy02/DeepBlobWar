@@ -108,7 +108,7 @@ It is possible to play in the following configurations:
 * Human vs Human
 * AI vs AI
 
-![Before jump](images/gui.png)
+![game_gui](images/game_gui.png)
     
   It is possible to specify size of the board. The default size is specified by the variable "__DEFAULT_SIZE__" in file 
   **app/environments/blobward/board_size.py**
@@ -126,7 +126,7 @@ It is possible to play in the following configurations:
 
 **Note**. The trained models should be the stored in the directory ** app/zoo/blobwar ** in the following format ** best_model[SIZE].zip **
 (For example best_model6.zip and best_model8.zip for board 6*6 and 8*8 respectfully)
-![model_store](images/model_store)
+![model_store](images/model_store.png)
 For a given size, if the model is not yet trained (ie best_model[SIZE].zip not exists), the AI player will use a greedy strategy which always try to 
 maximize its next move (not very smart.)
 
