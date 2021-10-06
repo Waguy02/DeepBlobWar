@@ -125,7 +125,7 @@ def selfplay_wrapper(env):
 
         def setup_opponents(self):
             if self.opponent_type == 'rules':
-                self.opponent_agent = Agent('rules')
+                self.opponent_agent = Agent('greedy')
             else:
                 # incremental load of new model
                 best_model_name = get_best_model_name(self.name)
