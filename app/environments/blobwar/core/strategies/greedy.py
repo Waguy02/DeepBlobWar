@@ -1,5 +1,4 @@
 
-
 from environments.blobwar.core.strategies.strategy import*
 import random
 
@@ -20,20 +19,19 @@ class Greedy(Strategy):
         moves=configuration.movements()
 
         if len(moves)>0:
-            move_max=None
-            value_max=-100000000000
-            for move in moves:
-                clone_conf=configuration.play(move)
-                clone_conf.current_player*=-1;
-                value=clone_conf.value()
-                if value>value_max:
-                    value_max=value
-                    move_max=move
+            moves_tuple=[(move,configuration.play(move).value()) for move in moves]
+            moves_sorted=sorted(moves_tuple,key=lambda item: item[1])
+
+            moves_max=[moves_sorted[0]]
+
+            for k,v in moves_tuple[1:]:
+                if v==moves_max[0][1]:
+                    moves_max.append((k,v))
+
+            best_move=random.choice(moves_max)[0]
 
 
-            return move_max
-
-
+            return best_move
         else :
             return None
 

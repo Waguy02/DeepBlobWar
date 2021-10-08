@@ -37,14 +37,15 @@ class BlobwarGui:
         self.env=env
         self.human_player=Human()
 
-
         try :
-            self.ai_player_1=PPO(self.env, size=self.env.core.board.shape[0])
+
+            self.ai_player_2 =PPO(self.env, size=self.env.core.board.shape[0])
         except Exception as e:
             print("PPO not yet trained for : ",self.env.core.board.shape[0])
-            self.ai_player_1 = GreedyPlayer()
+            self.ai_player_2 = GreedyPlayer()
 
-        self.ai_player_2=self.ai_player_1
+        self.ai_player_1 =GreedyPlayer()
+
 
         self.player1=self.player2=0
 
