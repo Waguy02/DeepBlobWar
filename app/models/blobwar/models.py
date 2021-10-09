@@ -54,7 +54,7 @@ class CustomPolicy(ActorCriticPolicy):
         return observations, legal_actions
 
 def value_head(y,size):
-    y = convolutional(y, 3, 3,name="")
+    y = convolutional(y, 32, 3,name="")
     actions=size**4
     y = Flatten()(y)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')

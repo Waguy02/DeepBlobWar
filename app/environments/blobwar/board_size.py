@@ -1,6 +1,6 @@
 import argparse
 
-__DEFAULT_SIZE__=6
+__DEFAULT_SIZE__=8
 __MIN_SIZE__=5
 __MAX_SIZE__=10
 

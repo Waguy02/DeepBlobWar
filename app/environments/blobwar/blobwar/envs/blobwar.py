@@ -96,8 +96,6 @@ class BlobWarEnv(gym.Env):
     def encode_action(self,move):
         if move==None:
             return self.encode_action([(0,0),(self.xsize-1,self.ysize-1)])
-
-
         x1,y1=move[0]
         x2,y2=move[1]
         xsize=self.xsize
