@@ -163,7 +163,7 @@ def cli() -> None:
             , help="The number of epoch to train the PPO agent per batch")
   parser.add_argument("--optim_stepsize", "-os",  type = float, default = 0.0003
             , help="The step size for the PPO optimiser")
-  parser.add_argument("--optim_batchsize", "-ob",  type = int, default = 1024
+  parser.add_argument("--optim_batchsize", "-ob",  type = int, default = 524
             , help="The minibatch size in the PPO optimiser")
   parser.add_argument("--lam", "-l",  type = float, default = 0.95
             , help="The value of lambda in PPO")
