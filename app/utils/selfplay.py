@@ -113,7 +113,9 @@ def selfplay_wrapper(env):
                 logger.debug(f'Done: {done}')
                 logger.debug(f'Total_round_reward: {total_rewards}')
             agent_reward = total_rewards[self.agent_player_num]
+
             logger.debug(f'Reward To Agent: {agent_reward}')
+            print("Agent reward:",agent_reward)
             self.render()
             return observation, agent_reward, done, {}
 
