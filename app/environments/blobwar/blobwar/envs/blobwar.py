@@ -119,7 +119,7 @@ class BlobWarEnv(gym.Env):
                 pass
             else:
                 pass
-            reward=1
+            reward=100
             rewards=[reward,reward]
             rewards[player_num]=-1*rewards[player_num] ##Highly penalize bad moves
         else :
