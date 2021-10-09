@@ -122,7 +122,7 @@ class BlobWarEnv(gym.Env):
             self.core.apply_movement(move)
             new_value = self.core.adverse_value()
             r, done = self.check_game_over()
-            reward=new_value-old_value if not done else self.xsize*self.ysize
+            reward=new_value-old_value
             rewards=[-reward,-reward]
             rewards[player_num]=-1*rewards[player_num]
 
