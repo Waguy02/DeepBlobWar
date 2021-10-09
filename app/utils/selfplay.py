@@ -86,7 +86,7 @@ def selfplay_wrapper(env):
                 action = self.current_agent.choose_action(self, choose_best_action = False, mask_invalid_actions = False)
 
                 if self.opponent_type == 'rules':
-                    assert(self.env.core.check_move(self.env.decode_action(action)),"Adversary rules based cannot play bad moves")
+                    assert(self.core.check_move(self.decode_action(action)),"Adversary rules based cannot play bad moves")
 
                 observation, rewards, done, _ = super(SelfPlayEnvBlobwar, self).step(action)
                 # formatted_action = super(SelfPlayEnvBlobwar, self).decode_action(action)
