@@ -114,7 +114,7 @@ class BlobWarEnv(gym.Env):
         old_value=self.core.value()
         player_num=self.current_player ##The player num before move beginning
         if not self.core.check_move(move):
-            done=True
+            done=False
             move=None
             if update:
                 self.core.apply_movement(move)
