@@ -54,7 +54,7 @@ class CustomPolicy(ActorCriticPolicy):
         return observations, legal_actions
 
 def value_head(y,size):
-    y = convolutional(y, 3, size-3,name="")
+    y = convolutional(y, 3, 3,name="")
     actions=size**4
     y = Flatten()(y)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')
@@ -62,7 +62,7 @@ def value_head(y,size):
     return vf, q
 
 def policy_head(y,legal_actions,size):
-    y = convolutional(y, 4, size-1,name="POLICY_CONV")
+    y = convolutional(y, 4, 3,name="POLICY_CONV")
     actions = size ** 4
 
     y = Flatten()(y)
@@ -74,10 +74,11 @@ def policy_head(y,legal_actions,size):
     return policy
 
 def resnet_extractor(y,size, **kwargs):
-    y = convolutional(y, 32,size-1,name="RESNET_CONV")
-    y = residual(y, 32,size - 1)
-    y = residual(y, 32, size - 1)
-    y = residual(y, 32, size - 1)
+    y = convolutional(y, 32,3,name="RESNET_CONV")
+    y = residual(y, 32,3)
+    y = residual(y, 32, 3)
+    y = residual(y, 32, 3)
+    y = residual(y, 32, 3)
     return y
 
 def convolutional(y, filters, kernel_size,name=None):
