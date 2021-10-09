@@ -116,32 +116,19 @@ class BlobWarEnv(gym.Env):
             move=None
             if update:
                 self.core.apply_movement(move)
-                pass
-            else:
-                pass
-            reward=100
+            reward=1e8
             rewards=[reward,reward]
             rewards[player_num]=-1*rewards[player_num] ##Highly penalize bad moves
         else :
             self.core.apply_movement(move)
             new_value = self.core.adverse_value()
             r, done = self.check_game_over()
-
             reward=new_value-old_value
-
             rewards=[-reward,-reward]
             rewards[player_num]=-1*rewards[player_num]
 
-
-
         self.current_player_num=self.current_player
         return self.observation, rewards , done, {}
-
-
-    #
-    # def normalize_reward(self,reward):
-    #     return float(reward)/float((self.xsize*self.ysize))
-
 
     def reset(self):
        self.core=Configuration(Board())
