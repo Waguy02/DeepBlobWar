@@ -41,7 +41,8 @@ class BlobWarEnv(gym.Env):
 
     @property
     def legal_actions(self):
-        legal_actions=[1 if self.core.check_move(self.decode_action(action)) else 0 for action in range(self.action_space.n)]
+        legal_actions={self.encode_action(move) for move in self.core.movements()}
+        legal_actions=[1 if action in legal_actions else 0 for action in range(self.action_space.n)]
         if np.sum(legal_actions)>1:
             legal_actions[self.encode_action(None)]=0 ##None action is only legal when it is the only possible action
 

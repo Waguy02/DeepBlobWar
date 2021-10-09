@@ -26,8 +26,9 @@ PLAYER1_COLOR="blue"
 PLAYER2_COLOR="orange"
 
 class BlobwarGui:
-    def __init__(self):
-        """:cvar"""
+    def __init__(self,simulation_mode=False):
+        """:cvar
+        """
 
         env = get_environment("blobwar")()
         env.seed(10)
@@ -36,7 +37,6 @@ class BlobwarGui:
         self.images_candidates={1: "blob_blue_candidate", 2: "blob_orange_candidate"}
         self.env=env
         self.human_player=Human()
-
         try :
 
             self.ai_player_2 =PPO(self.env, size=self.env.core.board.shape[0])
@@ -45,9 +45,14 @@ class BlobwarGui:
             self.ai_player_2 = GreedyPlayer()
 
         self.ai_player_1 =GreedyPlayer()
+        self.player1=self.player2=None
 
+        if simulation_mode:
 
-        self.player1=self.player2=0
+            self.state=GameState.WAITING_FIRST_CLICK
+            self.player1 =self.ai_player_1
+            self.player2 =self.player1
+            return
 
 
         self.game=Board(self.env.core.board.shape[0],self.env.core.board.shape[1])
@@ -108,9 +113,6 @@ class BlobwarGui:
                 self.env.core.apply_movement(movement)
                 self.print_status()
                 self.render()
-
-
-
 
     def render(self):
         for x in range(self.env.core.board.shape[0]):
@@ -212,9 +214,10 @@ class BlobwarGui:
                 self.print_status()
                 if not isinstance(current_player ,Human):
                     movement = current_player.choose_action(self.env)
+                    self.pause(1000)
                     self.env.core.apply_movement(movement)
                     self.print_status()
-                    self.pause(300)
+
                 else :
                     if len(self.env.core.movements())==0:
                         self.env.core.apply_movement(None)
@@ -268,6 +271,20 @@ class BlobwarGui:
             self.print_status()
             self.pause(50)
             self.render()
+
+
+    def simulate(self):
+        """:cvar
+        Game Autoplay between two IA players
+        """
+        while self.state!=GameState.GAME_OVER :
+            current_player = self.player1
+            movement = current_player.choose_action(self.env)
+            self.env.core.apply_movement(movement)
+            if self.env.core.game_over():
+                self.state=GameState.GAME_OVER
+
+        self.env.core.reset()
 
 
 
