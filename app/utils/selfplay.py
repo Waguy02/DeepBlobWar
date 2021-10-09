@@ -80,7 +80,7 @@ def selfplay_wrapper(env):
 
         def continue_game(self):
             """Working with partial rewards and at the end of the round, sum up reward amount step"""
-            adversary_round_rewards=[]
+            adversary_round_rewards=[0,0]
             if self.current_player_num != self.agent_player_num:
                 self.render()
                 action = self.current_agent.choose_action(self, choose_best_action = False, mask_invalid_actions = False)
