@@ -92,8 +92,8 @@ class BlobwarGui:
             self.player2=self.human_player
 
         else:
-            self.player1=self.ai_player_1
-            self.player2=self.ai_player_2
+            self.player1=self.ai_player_2
+            self.player2=self.ai_player_1
         self.env.core.reset()
         self.state=GameState.WAITING_FIRST_CLICK
 
