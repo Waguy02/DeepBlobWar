@@ -43,8 +43,8 @@ class BlobWarEnv(gym.Env):
     def legal_actions(self):
         legal_actions={self.encode_action(move) for move in self.core.movements()}
         legal_actions=[1 if action in legal_actions else 0 for action in range(self.action_space.n)]
-        if np.sum(legal_actions)>1:
-            legal_actions[self.encode_action(None)]=0 ##None action is only legal when it is the only possible action
+        legal_actions[self.encode_action(None)]=np.sum(legal_actions)==0##None action is only legal when it is the only possible action
+
 
         return np.array(legal_actions)
     ###Check if the game is over
@@ -120,7 +120,8 @@ class BlobWarEnv(gym.Env):
             rewards=[0,0]
             rewards[player_num]=-r ##Penalize bad moves
         else :
-            self.core.apply_movement(move)
+            if update:
+                self.core.apply_movement(move)
             new_value = self.core.adverse_value()
             r, done = self.check_game_over()
             reward=new_value-old_value if not done else new_value
