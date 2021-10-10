@@ -117,7 +117,7 @@ class BlobWarEnv(gym.Env):
             if update:
                 self.core.apply_movement(move)
             r=-self.xsize*self.ysize
-            rewards=[-r,r]
+            rewards=[r,r]
             rewards[player_num]=-1 ##Penalize bad moves
         else :
             self.core.apply_movement(move)
