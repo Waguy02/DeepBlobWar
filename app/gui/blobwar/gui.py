@@ -213,7 +213,7 @@ class BlobwarGui:
                 self.print_status()
                 if not isinstance(current_player ,Human):
                     movement = current_player.choose_action(self.env)
-                    self.pause(1000)
+                    # self.pause(1000)
                     self.env.core.apply_movement(movement)
                     self.print_status()
 
