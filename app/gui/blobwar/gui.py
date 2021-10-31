@@ -3,7 +3,7 @@ import time
 from game2dboard import Board
 from enum import Enum
 
-from gym.envs import game
+# from gym.envs import game
 
 from gui.blobwar.players.greedy import GreedyPlayer
 from gui.blobwar.players.human import Human
