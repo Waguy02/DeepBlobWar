@@ -57,6 +57,7 @@ def value_head(y,size):
     y = convolutional(y, 4, 1,name="")
     actions=size**4
     y = Flatten()(y)
+    y = dense(y, actions * 2)
     vf = dense(y, 1, batch_norm=False, activation='tanh', name='vf')
     q = dense(y, actions, batch_norm=False, activation='tanh', name='q')
     return vf, q
@@ -64,8 +65,8 @@ def value_head(y,size):
 def policy_head(y,legal_actions,size):
     y = convolutional(y, 4, 1,name="POLICY_CONV")
     actions = size ** 4
-
     y = Flatten()(y)
+    y=dense(y,actions*2)
     policy = dense(y, actions, batch_norm=False, name='pi')
     mask=Flatten()(legal_actions)
     mask = Lambda(lambda x: (1 - x) * -1e8)(mask)

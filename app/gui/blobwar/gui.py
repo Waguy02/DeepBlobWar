@@ -2,9 +2,6 @@ import time
 
 from game2dboard import Board
 from enum import Enum
-
-# from gym.envs import game
-
 from gui.blobwar.players.greedy import GreedyPlayer
 from gui.blobwar.players.human import Human
 from gui.blobwar.players.ppo import PPO
@@ -92,8 +89,8 @@ class BlobwarGui:
             self.player2=self.human_player
 
         else:
-            self.player1=self.ai_player_1
-            self.player2=self.ai_player_2
+            self.player1=self.ai_player_2
+            self.player2=self.ai_player_1
         self.env.core.reset()
         self.state=GameState.WAITING_FIRST_CLICK
 
