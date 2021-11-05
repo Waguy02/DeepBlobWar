@@ -111,12 +111,13 @@ class BlobWarEnv(gym.Env):
         move=self.decode_action(action)
         old_value=self.core.value()
         player_num=self.current_player ##The player num before move beginning
+        nb_cases=(self.xsize**4)
         if not self.core.check_move(move):
             done=True ##End game on bad move
             move=None
             if update:
                 self.core.apply_movement(move)
-            r=self.xsize**4
+            r=10*nb_cases
             rewards=[0,0]
             rewards[player_num]=-r ##Penalize bad moves
         else :
@@ -124,7 +125,7 @@ class BlobWarEnv(gym.Env):
                 self.core.apply_movement(move)
             new_value = self.core.adverse_value()
             r, done = self.check_game_over()
-            reward=new_value-old_value if not done else new_value
+            reward=new_value-old_value if not done else (nb_cases-new_value) ##Encourage long parties.
             rewards=[-reward,-reward]
             rewards[player_num]=-1*rewards[player_num]
 
